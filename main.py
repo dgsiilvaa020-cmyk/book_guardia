@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS pedidos (
     figurinha_id TEXT,
     chave_livro TEXT
     capa_id TEXT,
-    capa_tipo TEXT,
+    capa_tipo TEXT
 )
 """)
 
