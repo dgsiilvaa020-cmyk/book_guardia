@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS pedidos (
     arquivo_id TEXT,
     arquivo_tipo TEXT,
     figurinha_id TEXT,
-    chave_livro TEXT
+    chave_livro TEXT,
     capa_id TEXT,
     capa_tipo TEXT
 )
@@ -567,8 +567,7 @@ async def receber_figurinha(message: Message):
         await bot.send_document(
             chat_id=GRUPO_ACERVO,
             document=arquivo_id,
-            caption=caption,
-            reply_to_message_id=grupo_msg_id
+            caption=caption
         )
 
         cursor.execute("""
@@ -584,8 +583,7 @@ async def receber_figurinha(message: Message):
 
     await bot.send_sticker(
         chat_id=GRUPO_ACERVO,
-        sticker=message.sticker.file_id,
-        reply_to_message_id=grupo_msg_id
+        ssticker=message.sticker.file_id
     )
 
     cursor.execute("""
@@ -667,7 +665,6 @@ async def nao_encontrei(callback: CallbackQuery):
     await bot.send_message(
         chat_id=GRUPO_ACERVO,
         text=mensagem,
-        reply_to_message_id=grupo_msg_id
     )
 
     sticker_id = pegar_config("sticker_nao_encontrei")
@@ -676,7 +673,6 @@ async def nao_encontrei(callback: CallbackQuery):
         await bot.send_sticker(
             chat_id=GRUPO_ACERVO,
             sticker=sticker_id,
-            reply_to_message_id=grupo_msg_id
         )
 
     cursor.execute("""
