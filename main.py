@@ -136,11 +136,11 @@ def extrair_nome_livro(texto):
     return texto[:80].strip()
     
 
- def extrair_autor(texto):
+def extrair_autor(texto):
     linhas = texto.splitlines()
 
     for linha in linhas:
-        linha_limpa = linha.strip()
+    linha_limpa = linha.strip()
 
         if linha_limpa.lower().startswith("autor:"):
             return linha_limpa.split(":", 1)[1].strip()
