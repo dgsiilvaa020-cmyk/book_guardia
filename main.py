@@ -46,9 +46,7 @@ def gerar_hashtags(texto):
 
     tags = []
 
-    HASHTAGS = {
-
-categorias = {
+    categorias = {
 
     "#romance": [
         "romance",
