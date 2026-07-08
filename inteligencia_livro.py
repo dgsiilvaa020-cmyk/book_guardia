@@ -56,3 +56,112 @@ def descobrir_idioma(texto):
     except:
 
         return "PT"
+
+
+def criar_hashtags(texto, idioma):
+
+    texto = texto.lower()
+
+
+    if idioma == "PT":
+
+        banco = {
+
+            "#mafia": [
+                "máfia",
+                "mafioso",
+                "cartel"
+            ],
+
+            "#dark": [
+                "dark romance",
+                "vingança",
+                "obsessão"
+            ],
+
+            "#fantasia": [
+                "magia",
+                "dragão",
+                "reino",
+                "feitiço"
+            ],
+
+            "#romantasia": [
+                "magia",
+                "romance",
+                "princesa"
+            ],
+
+            "#realeza": [
+                "rei",
+                "rainha",
+                "principe",
+                "princesa"
+            ]
+
+        }
+
+
+    else:
+
+        banco = {
+
+            "#mafia": [
+                "mafia",
+                "gangster",
+                "cartel"
+            ],
+
+            "#darkromance": [
+                "dark romance",
+                "revenge",
+                "obsession"
+            ],
+
+            "#fantasy": [
+                "magic",
+                "dragon",
+                "kingdom"
+            ],
+
+            "#romantasy": [
+                "magic",
+                "romance",
+                "princess"
+            ]
+
+        }
+
+
+    resultado = []
+
+
+    for tag, palavras in banco.items():
+
+        for palavra in palavras:
+
+            if palavra in texto:
+
+                resultado.append(tag)
+                break
+
+
+    return resultado[:3]
+    
+
+def analisar_livro(caminho):
+
+    texto = ler_epub(caminho)
+
+    idioma = descobrir_idioma(texto)
+
+    hashtags = criar_hashtags(
+        texto,
+        idioma
+    )
+
+
+    return {
+        "idioma": idioma,
+        "hashtags": hashtags
+    }
