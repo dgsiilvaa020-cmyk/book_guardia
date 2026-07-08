@@ -568,14 +568,18 @@ async def receber_capa(message: Message):
 
     pacotes_pendentes[admin].append(pacote)
 
+    numero = len(pacotes_pendentes[admin])
+
     print("NOVA CAPA CRIADA:", pacote)
+
+    kb = InlineKeyboardBuilder()
 
     kb = InlineKeyboardBuilder()
     kb.button(text="🤖 Tradução Mecânica", callback_data="trad_mecanica")
     kb.button(text="📚 Tradução Oficial", callback_data="trad_oficial")
     kb.button(text="🇺🇸 Inglês", callback_data="trad_ingles")
     kb.button(text="⏭️ Pular tradução", callback_data="trad_pular")
-
+    
     await message.answer(
         f"✅ Capa #{numero} recebida.\n\n"
         "Escolha o tipo da tradução.",
@@ -596,33 +600,31 @@ async def escolher_traducao(callback: CallbackQuery):
 
     pacote = pacotes_pendentes[admin][-1]
 
-    print("BOTÃO CLICADO:", callback.data)
-    print("PACOTE ANTES:", pacote)
 
-    pacote["traducao"] = traducoes[callback.data]
-
-    print("TRADUÇÃO SALVA:", pacote)
-    
     traducoes = {
         "trad_mecanica": "🤖 Tradução Mecânica",
         "trad_oficial": "📚 Tradução Oficial",
-        "trad_ingles": "🇺🇸 English",
+        "trad_ingles": "🇺🇸 Inglês",
         "trad_pular": "⏭️ Sem tradução"
     }
 
-    pacote["traducao"] = traducoes[callback.data]
+
+    pacote["traducao"] = traducoes.get(callback.data)
+
 
     print("TRADUÇÃO SALVA:", pacote)
 
-    await callback.answer()
 
-    texto = (
+    await callback.answer("Tradução escolhida ✅")
+
+
+    await callback.message.edit_text(
         "✅ Tradução salva!\n\n"
-        "Agora envie o(s) arquivo(s) deste livro.\n\n"
-        "Quando terminar os arquivos deste livro, você pode:\n\n"
-        "📷 Enviar outra capa (para outro livro da série)\n"
+        "Agora envie os arquivos deste livro.\n\n"
+        "Quando terminar:\n"
+        "📷 envie outra capa\n"
         "ou\n"
-        "🏁 Finalizar com a figurinha."
+        "🏁 finalize com a figurinha."
     )
 
     await callback.message.edit_text(texto)
