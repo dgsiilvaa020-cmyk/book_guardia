@@ -743,6 +743,23 @@ async def receber_figurinha(message: Message):
             pedido_id,
             arquivo_id
         ))
+    
+
+        await bot.send_document(
+            chat_id=GRUPO_ACERVO,
+            document=arquivo_id
+        )
+
+        cursor.execute("""
+        INSERT OR IGNORE INTO entregues
+        (chave_livro, nome_livro, pedido_id, arquivo_id)
+        VALUES (?, ?, ?, ?)
+        """, (
+            chave_livro,
+            extrair_nome_livro(pedido_texto),
+            pedido_id,
+            arquivo_id
+        ))
 
     await bot.send_sticker(
         chat_id=GRUPO_ACERVO,
