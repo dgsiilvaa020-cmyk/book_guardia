@@ -134,6 +134,21 @@ def extrair_nome_livro(texto):
             return linha_limpa.split(":", 1)[1].strip()
 
     return texto[:80].strip()
+    
+
+ def extrair_autor(texto):
+    linhas = texto.splitlines()
+
+    for linha in linhas:
+        linha_limpa = linha.strip()
+
+        if linha_limpa.lower().startswith("autor:"):
+            return linha_limpa.split(":", 1)[1].strip()
+
+        if linha_limpa.lower().startswith("autora:"):
+            return linha_limpa.split(":", 1)[1].strip()
+
+    return "Autor não informado"
 
 
 def criar_chave_livro(texto):
@@ -572,7 +587,8 @@ async def receber_figurinha(message: Message):
         nome=nome,
         id_pedido=id_pedido,
         numero_missao=numero,
-        nome_livro=extrair_nome_livro(pedido_texto)
+        nome_livro=extrair_nome_livro(pedido_texto),
+        autor=extrair_autor(pedido_texto)
     )
 
 
@@ -862,8 +878,8 @@ async def editar_msg_arquivo(callback: CallbackQuery):
         "{nome} = nome da pessoa\n"
         "{id_pedido} = número interno da missão\n"
         "{numero_missao} = número visual organizado\n"
-        "{nome_livro} = nome do livro\n\n"
-        f"Mensagem atual:\n\n{atual}"
+        "{nome_livro} = nome do livro\n"
+        "{autor} = nome do autor\n\n"
     )
 
 
