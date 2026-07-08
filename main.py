@@ -712,54 +712,40 @@ async def receber_figurinha(message: Message):
     )
 
 
-    for indice, pacote in enumerate(pacotes_pendentes[admin_id]):
+        for indice, pacote in enumerate(pacotes_pendentes[admin_id]):
 
-    # Apenas a primeira capa recebe a legenda completa
-    if indice == 0:
-        caption = legenda
-    else:
-        caption = pacote["traducao"] if pacote["traducao"] else None
+        # Apenas a primeira capa recebe a legenda completa
+        if indice == 0:
+            caption = legenda
+        else:
+            caption = pacote["traducao"] if pacote["traducao"] else None
 
-    await bot.send_photo(
-        chat_id=GRUPO_ACERVO,
-        photo=pacote["capa"],
-        caption=caption
-    )
-
-    for arquivo_id in pacote["arquivos"]:
-
-        await bot.send_document(
+        await bot.send_photo(
             chat_id=GRUPO_ACERVO,
-            document=arquivo_id
+            photo=pacote["capa"],
+            caption=caption
         )
 
-        cursor.execute("""
-        INSERT OR IGNORE INTO entregues
-        (chave_livro, nome_livro, pedido_id, arquivo_id)
-        VALUES (?, ?, ?, ?)
-        """, (
-            chave_livro,
-            extrair_nome_livro(pedido_texto),
-            pedido_id,
-            arquivo_id
-        ))
+        for arquivo_id in pacote["arquivos"]:
+
+            await bot.send_document(
+                chat_id=GRUPO_ACERVO,
+                document=arquivo_id
+            )
+
+            cursor.execute("""
+            INSERT OR IGNORE INTO entregues
+            (chave_livro, nome_livro, pedido_id, arquivo_id)
+            VALUES (?, ?, ?, ?)
+            """, (
+                chave_livro,
+                extrair_nome_livro(pedido_texto),
+                pedido_id,
+                arquivo_id
+            ))
+
+    conn.commit()
     
-
-        await bot.send_document(
-            chat_id=GRUPO_ACERVO,
-            document=arquivo_id
-        )
-
-        cursor.execute("""
-        INSERT OR IGNORE INTO entregues
-        (chave_livro, nome_livro, pedido_id, arquivo_id)
-        VALUES (?, ?, ?, ?)
-        """, (
-            chave_livro,
-            extrair_nome_livro(pedido_texto),
-            pedido_id,
-            arquivo_id
-        ))
 
     await bot.send_sticker(
         chat_id=GRUPO_ACERVO,
