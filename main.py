@@ -23,6 +23,15 @@ dp = Dispatcher()
 conn = sqlite3.connect("pedidos.db")
 cursor = conn.cursor()
 
+try:
+    cursor.execute("""
+        ALTER TABLE pedidos
+        ADD COLUMN msg_registrada_id INTEGER
+    """)
+    conn.commit()
+except sqlite3.OperationalError:
+    pass
+
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS pedidos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
