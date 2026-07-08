@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS pedidos (
     pedido TEXT,
     status TEXT,
     grupo_msg_id INTEGER,
+    msg_registrada_id INTEGER,
     arquivo_id TEXT,
     arquivo_tipo TEXT,
     figurinha_id TEXT,
@@ -400,7 +401,17 @@ async def registrar_pedido(message: Message):
     ))
     conn.commit()
 
-    await message.reply(pegar_config("msg_pedido"))
+    msg = await message.reply(pegar_config("msg_pedido"))
+
+    cursor.execute("""
+    UPDATE pedidos
+    SET msg_registrada_id = ?
+    WHERE grupo_msg_id = ?
+    """, (
+        msg.message_id,
+        message.message_id
+    ))
+    conn.commit()
 
 
 @dp.callback_query(F.data == "missoes")
@@ -599,7 +610,13 @@ async def receber_figurinha(message: Message):
         return
 
     cursor.execute("""
-    SELECT id, nome, pedido, grupo_msg_id, chave_livro, status
+    SELECT id,
+           nome,
+           pedido,
+           grupo_msg_id,
+           msg_registrada_id,
+           chave_livro,
+           status
     FROM pedidos
     WHERE id = ? AND status IN ('pendente', 'nao_encontrado')
     """, (pedido_id,))
@@ -609,7 +626,7 @@ async def receber_figurinha(message: Message):
         await message.answer("⚠️ Missão não encontrada ou já finalizada.")
         return
 
-    id_pedido, nome, pedido_texto, grupo_msg_id, chave_livro, status = pedido
+    id_pedido, nome, pedido_texto, grupo_msg_id, msg_registrada_id, chave_livro, status = pedido
     numero = numero_visual(id_pedido, status)
 
     legenda = formatar_mensagem_config(
@@ -677,7 +694,16 @@ async def receber_figurinha(message: Message):
         nome_livro=extrair_nome_livro(pedido_texto),
         numero_missao=numero
     )
-        
+
+    if msg_registrada_id:
+        try:
+            await bot.delete_message(
+                chat_id=GRUPO_PEDIDOS,
+                message_id=msg_registrada_id
+            )
+        except:
+            pass
+    
     await bot.send_message(
         chat_id=GRUPO_PEDIDOS,
         text=mensagem_concluida,
