@@ -583,7 +583,7 @@ async def receber_figurinha(message: Message):
 
     await bot.send_sticker(
         chat_id=GRUPO_ACERVO,
-        ssticker=message.sticker.file_id
+        sticker=message.sticker.file_id
     )
 
     cursor.execute("""
