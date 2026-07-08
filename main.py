@@ -48,40 +48,181 @@ def gerar_hashtags(texto):
     tags = []
 
 
-    categorias = {
-        "fantasia": [
-            "magia",
-            "dragão",
-            "reino",
-            "feiticeiro",
-            "bruxa"
-        ],
+    HASHTAGS = {
 
-        "romantasia": [
-            "amor",
-            "romance",
-            "paixão",
-            "casamento"
-        ],
+    "#romance": [
+        "romance",
+        "amor",
+        "apaixon",
+        "love"
+    ],
 
-        "mafia": [
-            "máfia",
-            "mafioso",
-            "gangue"
-        ],
+    "#darkromance": [
+        "dark romance",
+        "dark",
+        "obsessão",
+        "obsession"
+    ],
 
-        "dark": [
-            "sombrio",
-            "vingança",
-            "obsessão"
-        ],
+    "#fantasia": [
+        "fantasia",
+        "fantasy",
+        "magic",
+        "magia",
+        "dragão",
+        "dragon",
+        "reino"
+    ],
 
-        "vampiros": [
-            "vampiro",
-            "imortal"
-        ]
-    }
+    "#romantasia": [
+        "fae",
+        "fadas",
+        "elfo",
+        "elf",
+        "magia",
+        "reino mágico"
+    ],
 
+    "#mafia": [
+        "máfia",
+        "mafia",
+        "mafioso",
+        "bratva",
+        "camorra",
+        "cosa nostra"
+    ],
+
+    "#lobisomem": [
+        "lobisomem",
+        "werewolf",
+        "alpha",
+        "beta",
+        "mate",
+        "alcateia"
+    ],
+
+    "#vampiro": [
+        "vampiro",
+        "vampire",
+        "imortal",
+        "blood"
+    ],
+
+    "#bruxas": [
+        "bruxa",
+        "witch",
+        "feiticeira",
+        "coven"
+    ],
+
+    "#realeza": [
+        "rei",
+        "rainha",
+        "princesa",
+        "príncipe",
+        "castle",
+        "coroa"
+    ],
+
+    "#bilionario": [
+        "bilionário",
+        "billionaire",
+        "ceo",
+        "empresário"
+    ],
+
+    "#faculdade": [
+        "college",
+        "campus",
+        "universidade",
+        "faculdade",
+        "professor",
+        "dormitório"
+    ],
+
+    "#harémreverso": [
+        "reverse harem",
+        "why choose"
+    ]
+}
+
+    TROPES = {
+
+    "#enemiestolovers": [
+        "enemy",
+        "enemy to lovers",
+        "inimigos"
+    ],
+
+    "#friendstolovers": [
+        "friends to lovers",
+        "melhores amigos"
+    ],
+
+    "#slowburn": [
+        "slow burn"
+    ],
+
+    "#arrangedmarriage": [
+        "casamento arranjado",
+        "arranged marriage"
+    ],
+
+    "#marriageofconvenience": [
+        "casamento por contrato",
+        "marriage of convenience"
+    ],
+
+    "#fatedmates": [
+        "mate",
+        "destinados",
+        "alma gêmea"
+    ],
+
+    "#reverseharem": [
+        "reverse harem",
+        "why choose"
+    ]
+}
+
+    TEMAS = {
+
+    "#gravidezinesperada": [
+        "gravidez",
+        "pregnant",
+        "unexpected pregnancy"
+    ],
+
+    "#bebê": [
+        "bebê",
+        "baby"
+    ],
+
+    "#vingança": [
+        "vingança",
+        "revenge"
+    ],
+
+    "#obsessão": [
+        "obsessão",
+        "obsession"
+    ],
+
+    "#magia": [
+        "magia",
+        "magic"
+    ],
+
+    "#dragões": [
+        "dragão",
+        "dragon"
+    ],
+
+    "#família": [
+        "family",
+        "família"
+    ]
+}
 
     for categoria, palavras in categorias.items():
 
