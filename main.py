@@ -124,16 +124,30 @@ def remover_acentos(texto):
 def extrair_nome_livro(texto):
     linhas = texto.splitlines()
 
+    palavras = [
+        "livro",
+        "nome do livro",
+        "titulo",
+        "título",
+        "nome"
+    ]
+
     for linha in linhas:
-        linha_limpa = linha.strip()
+        linha_original = linha.strip()
+        linha_limpa = remover_acentos(linha_original.lower())
 
-        if linha_limpa.lower().startswith("livro:"):
-            return linha_limpa.split(":", 1)[1].strip()
+        if ":" not in linha_original:
+            continue
 
-        if linha_limpa.lower().startswith("nome:"):
-            return linha_limpa.split(":", 1)[1].strip()
+        campo, valor = linha_original.split(":", 1)
+        campo = remover_acentos(campo.lower())
 
-    return texto[:80].strip()
+        if any(palavra in campo for palavra in palavras):
+            valor = valor.strip()
+            if valor:
+                return valor
+
+    return "Livro não informado"
     
 
 def extrair_autor(texto):
