@@ -231,7 +231,7 @@ def gerar_hashtags(texto):
                 break
 
 
-    return tags[:6]
+    return tags[:3]
 
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
