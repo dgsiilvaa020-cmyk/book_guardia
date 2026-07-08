@@ -208,6 +208,7 @@ def menu_personalizar():
     kb = InlineKeyboardBuilder()
     kb.button(text="📚 Mensagem da missão", callback_data="editar_msg_pedido")
     kb.button(text="🎯 Mensagem do arquivo", callback_data="editar_msg_arquivo")
+    kb.button(text="✅ Mensagem concluída", callback_data="editar_msg_pedido")
     kb.button(text="🔎 Mensagem: não encontrei", callback_data="editar_msg_nao_encontrei")
     kb.button(text="🖼️ Figurinha: não encontrei", callback_data="editar_sticker_nao_encontrei")
     kb.button(text="⬅️ Voltar", callback_data="voltar_menu")
