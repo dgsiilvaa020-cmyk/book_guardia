@@ -100,6 +100,7 @@ def salvar_config(chave, valor):
 
 configs_padrao = {
     "msg_pedido": "📚 Missão registrada, guardião 🎯\nA Guardiã dos Livros já está consultando o acervo.",
+    "msg_pedido": "✅ Missão concluída, aliado 🎯\nAO seu e-book já está nas Prateleiras da Guardiã. Confira no acervo.",
     "msg_arquivo": "🎯 Missão concluída pela Guardiã dos Livros!\n\n📚 Pedido de: {nome}\n📌 Missão #{numero_missao}",
     "msg_nao_encontrei": "🔍 Guardião, essa missão ainda não foi encontrada no acervo.\nEla ficará guardada nas Missões Não Encontradas.",
     "msg_ja_postado": "📚 Guardião, essa missão já foi concluída anteriormente.\nDá uma olhada no nosso acervo."
