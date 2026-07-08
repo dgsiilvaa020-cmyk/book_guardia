@@ -529,8 +529,8 @@ async def selecionar_pedido(callback: CallbackQuery):
     numero = numero_visual(id_pedido, status)
 
     pedido_selecionado[callback.from_user.id] = pedido_id
-    arquivos_pendentes[callback.from_user.id] = []
-
+    pacotes_pendentes[callback.from_user.id] = []
+    
     await callback.message.answer(
         f"🎯 Missão {numero} selecionada.\n\n"
         f"👤 Guardião solicitante: {nome}\n\n"
@@ -807,9 +807,9 @@ async def cancelar_envio(callback: CallbackQuery):
     admin_id = callback.from_user.id
     pedido_id = int(callback.data.replace("cancelar_envio_", ""))
 
-    arquivos_pendentes[admin_id] = []
+    pacotes_pendentes[admin_id] = []
     pedido_selecionado[admin_id] = pedido_id
-
+    
     await callback.message.answer(
         "❌ Envio cancelado.\n\n"
         "Os arquivos preparados foram descartados.\n"
@@ -871,7 +871,7 @@ async def nao_encontrei(callback: CallbackQuery):
     conn.commit()
 
     pedido_selecionado.pop(callback.from_user.id, None)
-    arquivos_pendentes.pop(callback.from_user.id, None)
+    pacotes_pendentes.pop(callback.from_user.id, None)
 
     await callback.message.answer(
         "🔍 Missão enviada para Missões Não Encontradas.\n"
@@ -922,7 +922,7 @@ async def finalizar_missao(callback: CallbackQuery):
     conn.commit()
 
     pedido_selecionado.pop(admin_id, None)
-    arquivos_pendentes.pop(admin_id, None)
+    pacotes_pendentes.pop(admin_id, None)
 
     await callback.message.answer(
         "✅ Missão finalizada com sucesso!\n"
