@@ -39,21 +39,21 @@ def gerar_hashtags(texto):
 
     categorias = {
 
-    "#romance": [
+    "romance": [
         "romance",
         "amor",
         "apaixon",
         "love"
     ],
 
-    "#darkromance": [
+    "darkromance": [
         "dark romance",
         "dark",
         "obsessão",
         "obsession"
     ],
 
-    "#fantasia": [
+    "fantasia": [
         "fantasia",
         "fantasy",
         "magic",
@@ -63,7 +63,7 @@ def gerar_hashtags(texto):
         "reino"
     ],
 
-    "#romantasia": [
+    "romantasia": [
         "fae",
         "fadas",
         "elfo",
@@ -72,7 +72,7 @@ def gerar_hashtags(texto):
         "reino mágico"
     ],
 
-    "#mafia": [
+    "mafia": [
         "máfia",
         "mafia",
         "mafioso",
@@ -81,7 +81,7 @@ def gerar_hashtags(texto):
         "cosa nostra"
     ],
 
-    "#lobisomem": [
+    "lobisomem": [
         "lobisomem",
         "werewolf",
         "alpha",
@@ -90,21 +90,21 @@ def gerar_hashtags(texto):
         "alcateia"
     ],
 
-    "#vampiro": [
+    "vampiro": [
         "vampiro",
         "vampire",
         "imortal",
         "blood"
     ],
 
-    "#bruxas": [
+    "bruxas": [
         "bruxa",
         "witch",
         "feiticeira",
         "coven"
     ],
 
-    "#realeza": [
+    "realeza": [
         "rei",
         "rainha",
         "princesa",
@@ -113,14 +113,14 @@ def gerar_hashtags(texto):
         "coroa"
     ],
 
-    "#bilionario": [
+    "bilionario": [
         "bilionário",
         "billionaire",
         "ceo",
         "empresário"
     ],
 
-    "#faculdade": [
+    "faculdade": [
         "college",
         "campus",
         "universidade",
@@ -129,7 +129,7 @@ def gerar_hashtags(texto):
         "dormitório"
     ],
 
-    "#harémreverso": [
+    "harémreverso": [
         "reverse harem",
         "why choose"
     ]
@@ -137,38 +137,38 @@ def gerar_hashtags(texto):
 
     TROPES = {
 
-    "#enemiestolovers": [
+    "enemiestolovers": [
         "enemy",
         "enemy to lovers",
         "inimigos"
     ],
 
-    "#friendstolovers": [
+    "friendstolovers": [
         "friends to lovers",
         "melhores amigos"
     ],
 
-    "#slowburn": [
+    "slowburn": [
         "slow burn"
     ],
 
-    "#arrangedmarriage": [
+    "arrangedmarriage": [
         "casamento arranjado",
         "arranged marriage"
     ],
 
-    "#marriageofconvenience": [
+    "marriageofconvenience": [
         "casamento por contrato",
         "marriage of convenience"
     ],
 
-    "#fatedmates": [
+    "fatedmates": [
         "mate",
         "destinados",
         "alma gêmea"
     ],
 
-    "#reverseharem": [
+    "reverseharem": [
         "reverse harem",
         "why choose"
     ]
@@ -176,28 +176,28 @@ def gerar_hashtags(texto):
 
     TEMAS = {
 
-    "#gravidezinesperada": [
+    "gravidezinesperada": [
         "gravidez",
         "pregnant",
         "unexpected pregnancy"
     ],
 
-    "#bebê": [
+    "bebê": [
         "bebê",
         "baby"
     ],
 
-    "#vingança": [
+    "vingança": [
         "vingança",
         "revenge"
     ],
 
-    "#obsessão": [
+    "obsessão": [
         "obsessão",
         "obsession"
     ],
 
-    "#MMRomance":[
+    "MMRomance":[
         "mm romance",
         "male/male",
         "his boyfriend",
@@ -206,7 +206,7 @@ def gerar_hashtags(texto):
         "two men"
     ],
 
-    "#FFRomance":[
+    "FFRomance":[
         "ff romance",
         "female/female",
         "girlfriend",
@@ -214,17 +214,17 @@ def gerar_hashtags(texto):
         "two women"
     ],
 
-    "#magia": [
+    "magia": [
         "magia",
         "magic"
     ],
 
-    "#dragões": [
+    "dragões": [
         "dragão",
         "dragon"
     ],
 
-    "#família": [
+    "família": [
         "family",
         "família"
     ]
