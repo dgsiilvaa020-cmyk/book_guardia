@@ -12,10 +12,10 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMINS = [8672397104]  # coloque seu ID aqui
 
 # Grupo onde os Aliados fazem os pedidos
-GRUPO_PEDIDOS = -10036402775
+GRUPO_PEDIDOS = -1003609010797
 
 # Grupo onde os Guardiões publicam os livros
-GRUPO_ACERVO = -5455638773
+GRUPO_ACERVO = -1004464402585
 
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher()
