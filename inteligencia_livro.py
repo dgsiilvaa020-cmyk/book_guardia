@@ -3,42 +3,243 @@ from bs4 import BeautifulSoup
 from langdetect import detect
 
 
-def ler_epub(caminho):
+def ler_inicio_epub(caminho):
 
     livro = epub.read_epub(caminho)
 
-    texto = ""
-
-    capitulos = 0
-
+    textos = []
 
     for item in livro.get_items():
 
-        if item.get_type() == 9:
-
-            html = item.get_content()
+        if item.get_type() == 9:  # documento HTML
 
             soup = BeautifulSoup(
-                html,
+                item.get_content(),
                 "html.parser"
             )
 
+            texto = soup.get_text(" ", strip=True)
 
-            texto += soup.get_text(
-                " ",
-                strip=True
-            )
-
-
-            capitulos += 1
+            if texto:
+                textos.append(texto)
 
 
-            # não lê o livro inteiro
-            if capitulos >= 10:
+    texto_final = "\n".join(textos)
+
+    # pega somente o começo
+    inicio = texto_final[:15000]
+
+    return inicio
+
+def gerar_hashtags(texto):
+
+    texto = texto.lower()
+
+    tags = []
+
+    categorias = {
+
+    "#romance": [
+        "romance",
+        "amor",
+        "apaixon",
+        "love"
+    ],
+
+    "#darkromance": [
+        "dark romance",
+        "dark",
+        "obsessão",
+        "obsession"
+    ],
+
+    "#fantasia": [
+        "fantasia",
+        "fantasy",
+        "magic",
+        "magia",
+        "dragão",
+        "dragon",
+        "reino"
+    ],
+
+    "#romantasia": [
+        "fae",
+        "fadas",
+        "elfo",
+        "elf",
+        "magia",
+        "reino mágico"
+    ],
+
+    "#mafia": [
+        "máfia",
+        "mafia",
+        "mafioso",
+        "bratva",
+        "camorra",
+        "cosa nostra"
+    ],
+
+    "#lobisomem": [
+        "lobisomem",
+        "werewolf",
+        "alpha",
+        "beta",
+        "mate",
+        "alcateia"
+    ],
+
+    "#vampiro": [
+        "vampiro",
+        "vampire",
+        "imortal",
+        "blood"
+    ],
+
+    "#bruxas": [
+        "bruxa",
+        "witch",
+        "feiticeira",
+        "coven"
+    ],
+
+    "#realeza": [
+        "rei",
+        "rainha",
+        "princesa",
+        "príncipe",
+        "castle",
+        "coroa"
+    ],
+
+    "#bilionario": [
+        "bilionário",
+        "billionaire",
+        "ceo",
+        "empresário"
+    ],
+
+    "#faculdade": [
+        "college",
+        "campus",
+        "universidade",
+        "faculdade",
+        "professor",
+        "dormitório"
+    ],
+
+    "#harémreverso": [
+        "reverse harem",
+        "why choose"
+    ]
+}
+
+    TROPES = {
+
+    "#enemiestolovers": [
+        "enemy",
+        "enemy to lovers",
+        "inimigos"
+    ],
+
+    "#friendstolovers": [
+        "friends to lovers",
+        "melhores amigos"
+    ],
+
+    "#slowburn": [
+        "slow burn"
+    ],
+
+    "#arrangedmarriage": [
+        "casamento arranjado",
+        "arranged marriage"
+    ],
+
+    "#marriageofconvenience": [
+        "casamento por contrato",
+        "marriage of convenience"
+    ],
+
+    "#fatedmates": [
+        "mate",
+        "destinados",
+        "alma gêmea"
+    ],
+
+    "#reverseharem": [
+        "reverse harem",
+        "why choose"
+    ]
+}
+
+    TEMAS = {
+
+    "#gravidezinesperada": [
+        "gravidez",
+        "pregnant",
+        "unexpected pregnancy"
+    ],
+
+    "#bebê": [
+        "bebê",
+        "baby"
+    ],
+
+    "#vingança": [
+        "vingança",
+        "revenge"
+    ],
+
+    "#obsessão": [
+        "obsessão",
+        "obsession"
+    ],
+
+    "#MMRomance":[
+        "mm romance",
+        "male/male",
+        "his boyfriend",
+        "boyfriend",
+        "he kissed him",
+        "two men"
+    ],
+
+    "#FFRomance":[
+        "ff romance",
+        "female/female",
+        "girlfriend",
+        "she kissed her",
+        "two women"
+    ],
+
+    "#magia": [
+        "magia",
+        "magic"
+    ],
+
+    "#dragões": [
+        "dragão",
+        "dragon"
+    ],
+
+    "#família": [
+        "family",
+        "família"
+    ]
+}
+
+    for categoria, palavras in categorias.items():
+
+        for palavra in palavras:
+
+            if palavra in texto:
+                tags.append("#" + categoria)
                 break
 
 
-    return texto
+    return tags[:3]
 
 
 
