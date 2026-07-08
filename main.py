@@ -73,8 +73,8 @@ conn.commit()
 
 pedido_selecionado = {}
 arquivos_pendentes = {}
-capas_pendentes = {}
-traducao_pendente = {}
+capa_pendente = {}
+pacotes_pendentes = {}
 modo_edicao = {}
 
 
