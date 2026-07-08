@@ -568,14 +568,13 @@ async def receber_capa(message: Message):
 
     pacotes_pendentes[admin].append(pacote)
 
-    numero = len(pacotes_pendentes[admin])
+    print("NOVA CAPA CRIADA:", pacote)
 
     kb = InlineKeyboardBuilder()
     kb.button(text="🤖 Tradução Mecânica", callback_data="trad_mecanica")
     kb.button(text="📚 Tradução Oficial", callback_data="trad_oficial")
     kb.button(text="🇺🇸 Inglês", callback_data="trad_ingles")
     kb.button(text="⏭️ Pular tradução", callback_data="trad_pular")
-    kb.adjust(2)
 
     await message.answer(
         f"✅ Capa #{numero} recebida.\n\n"
@@ -597,7 +596,12 @@ async def escolher_traducao(callback: CallbackQuery):
 
     pacote = pacotes_pendentes[admin][-1]
 
-    print("PACOTE ATUAL:", pacote)
+    print("BOTÃO CLICADO:", callback.data)
+    print("PACOTE ANTES:", pacote)
+
+    pacote["traducao"] = traducoes[callback.data]
+
+    print("TRADUÇÃO SALVA:", pacote)
     
     traducoes = {
         "trad_mecanica": "🤖 Tradução Mecânica",
@@ -607,6 +611,8 @@ async def escolher_traducao(callback: CallbackQuery):
     }
 
     pacote["traducao"] = traducoes[callback.data]
+
+    print("TRADUÇÃO SALVA:", pacote)
 
     await callback.answer()
 
@@ -639,10 +645,6 @@ async def receber_arquivo(message: Message):
         return
 
     pacote = pacotes_pendentes[admin][-1]
-
-    if pacote.get("traducao") is not None:
-        await callback.answer("Essa capa já possui tradução.", show_alert=True)
-        return
     
     pacote["arquivos"].append(message.document.file_id)
 
