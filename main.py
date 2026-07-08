@@ -44,11 +44,11 @@ def gerar_hashtags(texto):
 
     texto = texto.lower()
 
-
     tags = []
 
-
     HASHTAGS = {
+
+categorias = {
 
     "#romance": [
         "romance",
@@ -233,7 +233,7 @@ def gerar_hashtags(texto):
                 break
 
 
-    return tags[:3]
+    return tags[:6]
 
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
