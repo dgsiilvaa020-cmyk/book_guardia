@@ -738,38 +738,41 @@ async def receber_arquivo(message: Message):
     
     pacote["arquivos"].append(message.document.file_id)
 
-    nome = message.document.file_name.lower()
+
+    nome_arquivo = message.document.file_name.lower()
 
 
-if nome.endswith(".epub"):
+    if nome_arquivo.endswith(".epub"):
 
-    arquivo = await bot.get_file(
-        message.document.file_id
-    )
-
-
-    caminho = f"temp_{admin}.epub"
+        arquivo = await bot.get_file(
+            message.document.file_id
+        )
 
 
-    await bot.download_file(
-        arquivo.file_path,
-        caminho
-    )
+        caminho = f"temp_{admin}.epub"
 
 
-    texto = ler_inicio_epub(caminho)
+        await bot.download_file(
+            arquivo.file_path,
+            caminho
+        )
 
 
-    hashtags = gerar_hashtags(texto)
+        texto = ler_inicio_epub(caminho)
 
 
-    pacote["hashtags"] = hashtags
+        hashtags = gerar_hashtags(texto)
 
 
-    print("HASHTAGS GERADAS:")
-    print(hashtags)
+        pacote["hashtags"] = hashtags
+
+
+        print("HASHTAGS GERADAS:")
+        print(hashtags)
+
 
     total = len(pacote["arquivos"])
+
 
     await message.answer(
         f"✅ Arquivo recebido.\n\n"
