@@ -574,7 +574,7 @@ async def receber_capa(message: Message):
     kb.button(text="🤖 Tradução Mecânica", callback_data="trad_mecanica")
     kb.button(text="📚 Tradução Oficial", callback_data="trad_oficial")
     kb.button(text="🇺🇸 Inglês", callback_data="trad_ingles")
-    kb.button(text="⏭️ Pular tradução", callback_data="trad_pular"
+    kb.button(text="⏭️ Pular tradução", callback_data="trad_pular")
     kb.adjust(2)
 
     await message.answer(
@@ -597,14 +597,16 @@ async def escolher_traducao(callback: CallbackQuery):
 
     pacote = pacotes_pendentes[admin][-1]
 
+    print("PACOTE ATUAL:", pacote)
+    
     traducoes = {
         "trad_mecanica": "🤖 Tradução Mecânica",
         "trad_oficial": "📚 Tradução Oficial",
         "trad_ingles": "🇺🇸 English",
-        "trad_pular": None
+        "trad_pular": "⏭️ Sem tradução"
     }
 
-    pacote["traducao"] = traducoes.get(callback.data)
+    pacote["traducao"] = traducoes[callback.data]
 
     await callback.answer()
 
@@ -722,6 +724,8 @@ async def receber_figurinha(message: Message):
             
         if pacote["traducao"]:
             caption += f"\n\n🌐 Tradução: {pacote['traducao']}"
+
+        print("ENVIANDO CAPA:", pacote)
             
         await bot.send_photo(
             chat_id=GRUPO_ACERVO,
