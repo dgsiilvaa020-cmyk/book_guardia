@@ -574,7 +574,7 @@ async def receber_capa(message: Message):
     kb.button(text="🤖 Tradução Mecânica", callback_data="trad_mecanica")
     kb.button(text="📚 Tradução Oficial", callback_data="trad_oficial")
     kb.button(text="🇺🇸 Inglês", callback_data="trad_ingles")
-    kb.button(text="➡️ Sem legenda", callback_data="trad_sem")
+    kb.button(text="⏭️ Pular tradução", callback_data="trad_pular"
     kb.adjust(2)
 
     await message.answer(
@@ -601,7 +601,7 @@ async def escolher_traducao(callback: CallbackQuery):
         "trad_mecanica": "🤖 Tradução Mecânica",
         "trad_oficial": "📚 Tradução Oficial",
         "trad_ingles": "🇺🇸 English",
-        "trad_sem": None
+        "trad_pular": None
     }
 
     pacote["traducao"] = traducoes.get(callback.data)
@@ -638,6 +638,10 @@ async def receber_arquivo(message: Message):
 
     pacote = pacotes_pendentes[admin][-1]
 
+    if pacote.get("traducao") is not None:
+        await callback.answer("Essa capa já possui tradução.", show_alert=True)
+        return
+    
     pacote["arquivos"].append(message.document.file_id)
 
     total = len(pacote["arquivos"])
@@ -714,11 +718,11 @@ async def receber_figurinha(message: Message):
     for indice, pacote in enumerate(pacotes_pendentes[admin_id]):
 
         # Apenas a primeira capa recebe a legenda completa
-        if indice == 0:
-            caption = legenda
-        else:
-            caption = pacote["traducao"] if pacote["traducao"] else None
-
+        caption = legenda
+            
+        if pacote["traducao"]:
+            caption += f"\n\n🌐 Tradução: {pacote['traducao']}"
+            
         await bot.send_photo(
             chat_id=GRUPO_ACERVO,
             photo=pacote["capa"],
