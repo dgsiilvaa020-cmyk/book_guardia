@@ -711,8 +711,7 @@ async def receber_figurinha(message: Message):
         autor=extrair_autor(pedido_texto)
     )
 
-
-        for indice, pacote in enumerate(pacotes_pendentes[admin_id]):
+    for indice, pacote in enumerate(pacotes_pendentes[admin_id]):
 
         # Apenas a primeira capa recebe a legenda completa
         if indice == 0:
