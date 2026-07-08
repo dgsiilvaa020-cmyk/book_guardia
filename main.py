@@ -72,11 +72,11 @@ CREATE TABLE IF NOT EXISTS entregues (
 conn.commit()
 
 pedido_selecionado = {}
-arquivos_pendentes = {}
-capa_pendente = {}
-pacotes_pendentes = {}
-modo_edicao = {}
 
+# Cada administrador terá vários pacotes
+pacotes_pendentes = {}
+
+modo_edicao = {}
 
 def autorizado(user_id: int):
     return user_id in ADMINS
@@ -622,29 +622,33 @@ async def escolher_traducao(callback: CallbackQuery):
 
 @dp.message(F.chat.type == "private", F.document)
 async def receber_arquivo(message: Message):
+
     if not autorizado(message.from_user.id):
         return
 
-    admin_id = message.from_user.id
-    pedido_id = pedido_selecionado.get(admin_id)
+    admin = message.from_user.id
 
-    if not pedido_id:
-        await message.answer("⚠️ Primeiro escolha uma missão em 🎯 Missões registradas.")
+    if admin not in pacotes_pendentes:
+        await message.answer("Primeiro envie uma capa.")
         return
 
-    arquivos_pendentes.setdefault(admin_id, [])
-    arquivos_pendentes[admin_id].append(message.document.file_id)
+    if not pacotes_pendentes[admin]:
+        await message.answer("Primeiro envie uma capa.")
+        return
 
-    total = len(arquivos_pendentes[admin_id])
+    pacote = pacotes_pendentes[admin][-1]
+
+    pacote["arquivos"].append(message.document.file_id)
+
+    total = len(pacote["arquivos"])
 
     await message.answer(
-        f"✅ Arquivo recebido.\n"
-        f"📦 Total de arquivos preparados nesta missão: {total}\n\n"
-        "Pode enviar mais arquivos.\n"
-        "Quando terminar, envie a figurinha de confirmação.",
-        reply_markup=menu_missao_acoes(pedido_id)
+        f"✅ Arquivo recebido.\n\n"
+        f"Arquivos deste livro: {total}\n\n"
+        "Pode enviar mais arquivos deste mesmo livro.\n"
+        "Quando terminar este livro, envie outra capa ou finalize com a figurinha."
     )
-
+    
 
 @dp.message(F.chat.type == "private", F.sticker)
 async def receber_figurinha(message: Message):
@@ -670,10 +674,12 @@ async def receber_figurinha(message: Message):
         await message.answer("⚠️ Primeiro escolha uma missão em 🎯 Missões registradas.")
         return
 
-    lista_arquivos = arquivos_pendentes.get(admin_id, [])
+    if admin_id not in pacotes_pendentes:
+        await message.answer("⚠️ Nenhum livro preparado.")
+        return
 
-    if not lista_arquivos:
-        await message.answer("⚠️ Envie pelo menos um arquivo antes da figurinha.")
+    if not pacotes_pendentes[admin_id]:
+        await message.answer("⚠️ Nenhum livro preparado.")
         return
 
     cursor.execute("""
@@ -706,21 +712,40 @@ async def receber_figurinha(message: Message):
     )
 
 
-    capa = capa_pendente.get(admin_id)
+    for indice, pacote in enumerate(pacotes_pendentes[admin_id]):
 
-    if capa:
-        await bot.send_photo(
+    # Apenas a primeira capa recebe a legenda completa
+    if indice == 0:
+        caption = legenda
+    else:
+        if pacote["traducao"]:
+            caption = pacote["traducao"]
+        else:
+            caption = None
 
+    await bot.send_photo(
+        chat_id=GRUPO_ACERVO,
+        photo=pacote["capa"],
+        caption=caption
+    )
+
+    for arquivo_id in pacote["arquivos"]:
+
+        await bot.send_document(
             chat_id=GRUPO_ACERVO,
-
-            photo=capa,
-
-            caption=legenda
-
+            document=arquivo_id
         )
 
-    for index, arquivo_id in enumerate(lista_arquivos, start=1):
-        caption = None
+        cursor.execute("""
+        INSERT OR IGNORE INTO entregues
+        (chave_livro, nome_livro, pedido_id, arquivo_id)
+        VALUES (?, ?, ?, ?)
+        """, (
+            chave_livro,
+            extrair_nome_livro(pedido_texto),
+            pedido_id,
+            arquivo_id
+        ))
 
         await bot.send_document(
             chat_id=GRUPO_ACERVO,
@@ -778,8 +803,8 @@ async def receber_figurinha(message: Message):
     )
 
     
-    arquivos_pendentes[admin_id] = []
-
+    pacotes_pendentes.pop(admin_id, None)
+    
     await message.answer(
         "✅ Arquivo(s) enviados com sucesso!\n\n"
         "🎯 A missão continua aberta.\n"
