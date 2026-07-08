@@ -73,7 +73,8 @@ conn.commit()
 
 pedido_selecionado = {}
 arquivos_pendentes = {}
-capa_pendente = {}
+capas_pendentes = {}
+traducao_pendente = {}
 modo_edicao = {}
 
 
@@ -555,11 +556,68 @@ async def receber_capa(message: Message):
         )
         return
 
-    capa_pendente[admin] = message.photo[-1].file_id
+    # Se ainda não existir a lista de pacotes
+    pacotes_pendentes.setdefault(admin, [])
+
+    # Cria um novo pacote
+    pacote = {
+        "capa": message.photo[-1].file_id,
+        "traducao": None,
+        "arquivos": []
+    }
+
+    pacotes_pendentes[admin].append(pacote)
+
+    numero = len(pacotes_pendentes[admin])
+
+    kb = InlineKeyboardBuilder()
+    kb.button(text="🤖 Tradução Mecânica", callback_data="trad_mecanica")
+    kb.button(text="📚 Tradução Oficial", callback_data="trad_oficial")
+    kb.button(text="🇺🇸 Inglês", callback_data="trad_ingles")
+    kb.button(text="➡️ Sem legenda", callback_data="trad_sem")
+    kb.adjust(2)
 
     await message.answer(
-        "✅ Capa salva!\n\nAgora envie os arquivos."
+        f"✅ Capa #{numero} recebida.\n\n"
+        "Escolha o tipo da tradução.",
+        reply_markup=kb.as_markup()
     )
+
+@dp.callback_query(F.data.startswith("trad_"))
+async def escolher_traducao(callback: CallbackQuery):
+
+    if not autorizado(callback.from_user.id):
+        return
+
+    admin = callback.from_user.id
+
+    if admin not in pacotes_pendentes or not pacotes_pendentes[admin]:
+        await callback.answer("Nenhuma capa encontrada.", show_alert=True)
+        return
+
+    pacote = pacotes_pendentes[admin][-1]
+
+    traducoes = {
+        "trad_mecanica": "🤖 Tradução Mecânica",
+        "trad_oficial": "📚 Tradução Oficial",
+        "trad_ingles": "🇺🇸 English",
+        "trad_sem": None
+    }
+
+    pacote["traducao"] = traducoes.get(callback.data)
+
+    await callback.answer()
+
+    texto = (
+        "✅ Tradução salva!\n\n"
+        "Agora envie o(s) arquivo(s) deste livro.\n\n"
+        "Quando terminar os arquivos deste livro, você pode:\n\n"
+        "📷 Enviar outra capa (para outro livro da série)\n"
+        "ou\n"
+        "🏁 Finalizar com a figurinha."
+    )
+
+    await callback.message.edit_text(texto)
 
 
 @dp.message(F.chat.type == "private", F.document)
