@@ -57,7 +57,6 @@ def descobrir_idioma(texto):
 
         return "PT"
 
-
 def criar_hashtags(texto, idioma):
 
     texto = texto.lower()
@@ -147,7 +146,6 @@ def criar_hashtags(texto, idioma):
 
 
     return resultado[:3]
-    
 
 def analisar_livro(caminho):
 
