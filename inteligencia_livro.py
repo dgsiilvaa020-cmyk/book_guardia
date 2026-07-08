@@ -1,6 +1,7 @@
 from ebooklib import epub
 from bs4 import BeautifulSoup
 from langdetect import detect
+import re
 
 
 def ler_inicio_epub(caminho):
@@ -29,7 +30,87 @@ def ler_inicio_epub(caminho):
     # pega somente o começo
     inicio = texto_final[:15000]
 
-    return inicio
+return inicio
+
+
+def extrair_hashtags_explicitas(texto):
+
+    texto = texto.lower()
+
+    banco = {
+        "dark romance": "#darkromance",
+        "dark": "#darkromance",
+
+        "harém reverso": "#harémreverso",
+        "reverse harem": "#harémreverso",
+        "why choose": "#harémreverso",
+
+        "bdsm": "#bdsm",
+
+        "age gap": "#agegap",
+
+        "enemies to lovers": "#enemiestolovers",
+
+        "friends to lovers": "#friendstolovers",
+
+        "slow burn": "#slowburn",
+
+        "fake dating": "#fakedating",
+
+        "arranged marriage": "#arrangedmarriage",
+
+        "marriage of convenience": "#marriageofconvenience",
+
+        "grumpy x sunshine": "#grumpyxsunshine",
+
+        "black cat x golden retriever": "#blackcatxgoldenretriever",
+
+        "fated mates": "#fatedmates",
+
+        "soulmates": "#fatedmates",
+
+        "ceo": "#ceo",
+        "ceos": "#ceo",
+
+        "bilionário": "#bilionario",
+        "billionaire": "#bilionario",
+
+        "máfia": "#mafia",
+        "mafia": "#mafia",
+
+        "vampiro": "#vampiro",
+        "vampire": "#vampiro",
+
+        "lobisomem": "#lobisomem",
+        "werewolf": "#lobisomem",
+
+        "bruxa": "#bruxas",
+        "witch": "#bruxas",
+
+        "romantasia": "#romantasia",
+
+        "fantasia": "#fantasia",
+
+        "gravidez inesperada": "#gravidezinesperada",
+
+        "bebê": "#bebe",
+        "baby": "#bebe",
+
+        "mm romance": "#MMRomance",
+        "male/male": "#MMRomance",
+
+        "ff romance": "#FFRomance",
+        "female/female": "#FFRomance",
+    }
+
+    encontrados = []
+
+    for palavra, hashtag in banco.items():
+
+        if palavra in texto and hashtag not in encontrados:
+            encontrados.append(hashtag)
+
+    return encontrados
 
 def gerar_hashtags(texto):
 
