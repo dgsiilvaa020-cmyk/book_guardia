@@ -100,7 +100,7 @@ def salvar_config(chave, valor):
 
 configs_padrao = {
     "msg_pedido": "📚 Missão registrada, guardião 🎯\nA Guardiã dos Livros já está consultando o acervo.",
-    "msg_pedido": "✅ Missão concluída, aliado 🎯\nAO seu e-book já está nas Prateleiras da Guardiã. Confira no acervo.",
+    "msg_concluida": "✅ Pedido concluído!\n\n📚 {nome}, seu livro já está disponível no acervo."
     "msg_arquivo": "🎯 Missão concluída pela Guardiã dos Livros!\n\n📚 Pedido de: {nome}\n📌 Missão #{numero_missao}",
     "msg_nao_encontrei": "🔍 Guardião, essa missão ainda não foi encontrada no acervo.\nEla ficará guardada nas Missões Não Encontradas.",
     "msg_ja_postado": "📚 Guardião, essa missão já foi concluída anteriormente.\nDá uma olhada no nosso acervo."
@@ -209,7 +209,7 @@ def menu_personalizar():
     kb = InlineKeyboardBuilder()
     kb.button(text="📚 Mensagem da missão", callback_data="editar_msg_pedido")
     kb.button(text="🎯 Mensagem do arquivo", callback_data="editar_msg_arquivo")
-    kb.button(text="✅ Mensagem concluída", callback_data="editar_msg_pedido")
+    kb.button(text="✅ Mensagem concluída", callback_data="editar_msg_concluida")
     kb.button(text="🔎 Mensagem: não encontrei", callback_data="editar_msg_nao_encontrei")
     kb.button(text="🖼️ Figurinha: não encontrei", callback_data="editar_sticker_nao_encontrei")
     kb.button(text="⬅️ Voltar", callback_data="voltar_menu")
@@ -380,6 +380,28 @@ async def missoes(callback: CallbackQuery):
     await callback.message.answer(
         "🎯 Escolha qual missão deseja abrir:",
         reply_markup=menu_pedidos(pedidos)
+    )
+
+@dp.callback_query(F.data == "editar_msg_concluida")
+async def editar_msg_concluida(callback: CallbackQuery):
+    if not autorizado(callback.from_user.id):
+        await callback.answer("Sem permissão.", show_alert=True)
+        return
+
+    await callback.answer()
+
+    modo_edicao[callback.from_user.id] = "msg_concluida"
+
+    atual = pegar_config("msg_concluida")
+
+    await callback.message.answer(
+        "✅ Envie agora a nova mensagem de pedido concluído.\n\n"
+        "Essa mensagem será enviada no grupo de pedidos "
+        "respondendo a mensagem da pessoa quando o livro for entregue no acervo.\n\n"
+        "Você pode usar:\n"
+        "{nome} = nome da pessoa\n"
+        "{nome_livro} = nome do livro\n\n"
+        f"Mensagem atual:\n\n{atual}"
     )
 
 
@@ -598,7 +620,21 @@ async def receber_figurinha(message: Message):
     ))
 
     conn.commit()
+    
+    mensagem_concluida = formatar_mensagem_config(
+        "msg_concluida",
+        nome=nome,
+        nome_livro=extrair_nome_livro(pedido_texto),
+        numero_missao=numero
+    )
+        
+    await bot.send_message(
+        chat_id=GRUPO_PEDIDOS,
+        text=mensagem_concluida,
+        reply_to_message_id=grupo_msg_id
+    )
 
+    
     arquivos_pendentes[admin_id] = []
 
     await message.answer(
