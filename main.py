@@ -7,6 +7,93 @@ from aiogram import Bot, Dispatcher, F
 from aiogram.types import Message, CallbackQuery, BotCommand
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from ebooklib import epub
+from bs4 import BeautifulSoup
+import tempfile
+
+
+def ler_inicio_epub(caminho):
+
+    livro = epub.read_epub(caminho)
+
+    textos = []
+
+    for item in livro.get_items():
+
+        if item.get_type() == 9:  # documento HTML
+
+            soup = BeautifulSoup(
+                item.get_content(),
+                "html.parser"
+            )
+
+            texto = soup.get_text(" ", strip=True)
+
+            if texto:
+                textos.append(texto)
+
+
+    texto_final = "\n".join(textos)
+
+    # pega somente o começo
+    inicio = texto_final[:15000]
+
+    return inicio
+
+def gerar_hashtags(texto):
+
+    texto = texto.lower()
+
+
+    tags = []
+
+
+    categorias = {
+        "fantasia": [
+            "magia",
+            "dragão",
+            "reino",
+            "feiticeiro",
+            "bruxa"
+        ],
+
+        "romantasia": [
+            "amor",
+            "romance",
+            "paixão",
+            "casamento"
+        ],
+
+        "mafia": [
+            "máfia",
+            "mafioso",
+            "gangue"
+        ],
+
+        "dark": [
+            "sombrio",
+            "vingança",
+            "obsessão"
+        ],
+
+        "vampiros": [
+            "vampiro",
+            "imortal"
+        ]
+    }
+
+
+    for categoria, palavras in categorias.items():
+
+        for palavra in palavras:
+
+            if palavra in texto:
+                tags.append("#" + categoria)
+                break
+
+
+    return tags[:3]
+
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMINS = [8672397104]  # coloque seu ID aqui
@@ -563,7 +650,8 @@ async def receber_capa(message: Message):
     pacote = {
         "capa": message.photo[-1].file_id,
         "traducao": None,
-        "arquivos": []
+        "arquivos": [],
+        "hashtags": []
     }
 
     pacotes_pendentes[admin].append(pacote)
@@ -650,6 +738,37 @@ async def receber_arquivo(message: Message):
     
     pacote["arquivos"].append(message.document.file_id)
 
+    nome = message.document.file_name.lower()
+
+
+if nome.endswith(".epub"):
+
+    arquivo = await bot.get_file(
+        message.document.file_id
+    )
+
+
+    caminho = f"temp_{admin}.epub"
+
+
+    await bot.download_file(
+        arquivo.file_path,
+        caminho
+    )
+
+
+    texto = ler_inicio_epub(caminho)
+
+
+    hashtags = gerar_hashtags(texto)
+
+
+    pacote["hashtags"] = hashtags
+
+
+    print("HASHTAGS GERADAS:")
+    print(hashtags)
+
     total = len(pacote["arquivos"])
 
     await message.answer(
@@ -728,6 +847,14 @@ async def receber_figurinha(message: Message):
             
         if pacote["traducao"]:
             caption += f"\n\n🌐 Tradução: {pacote['traducao']}"
+            
+
+        if pacote.get("hashtags"):
+
+            caption += (
+                "\n\n🏷️ "
+                + " ".join(pacote["hashtags"])
+            )
 
         print("ENVIANDO CAPA:", pacote)
             
