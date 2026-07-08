@@ -139,14 +139,30 @@ def extrair_nome_livro(texto):
 def extrair_autor(texto):
     linhas = texto.splitlines()
 
+    palavras = [
+        "autor",
+        "autora",
+        "autor(a)",
+        "escritor",
+        "escritora",
+        "nome do autor",
+        "nome da autora"
+    ]
+
     for linha in linhas:
-        linha_limpa = linha.strip()
+        linha_original = linha.strip()
+        linha_limpa = remover_acentos(linha_original.lower())
 
-        if linha_limpa.lower().startswith("autor:"):
-            return linha_limpa.split(":", 1)[1].strip()
+        if ":" not in linha_original:
+            continue
 
-        if linha_limpa.lower().startswith("autora:"):
-            return linha_limpa.split(":", 1)[1].strip()
+        campo, valor = linha_original.split(":", 1)
+        campo = remover_acentos(campo.lower())
+
+        if any(palavra in campo for palavra in palavras):
+            valor = valor.strip()
+            if valor:
+                return valor
 
     return "Autor não informado"
 
