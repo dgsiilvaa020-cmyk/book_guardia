@@ -202,6 +202,28 @@ def extrair_autor(texto):
 
     return "Autor não informado"
 
+def extrair_metadados_epub(caminho):
+    try:
+        livro = epub.read_epub(caminho)
+
+        titulo = "Livro não informado"
+        autor = "Autor não informado"
+
+        # Título
+        titulos = livro.get_metadata("DC", "title")
+        if titulos:
+            titulo = titulos[0][0].strip()
+
+        # Autor
+        autores = livro.get_metadata("DC", "creator")
+        if autores:
+            autor = autores[0][0].strip()
+
+        return titulo, autor
+
+    except Exception as e:
+        print("Erro lendo metadados EPUB:", e)
+        return "Livro não informado", "Autor não informado"
 
 def criar_chave_livro(texto):
     nome = extrair_nome_livro(texto)
@@ -684,9 +706,24 @@ async def receber_arquivo(message: Message):
 
         texto = ler_inicio_epub(caminho)
 
+        nome_livro_epub, autor_epub = extrair_metadados_epub(caminho)
+
+        pacote["nome_livro"] = nome_livro_epub
+        pacote["autor"] = autor_epub
+
+        chave_livro = remover_acentos(
+            nome_livro_epub.lower()
+        )
+
+        chave_livro = re.sub(
+            r"[^a-z0-9]+",
+            " ",
+            chave_livro
+        ).strip()
+
+        pacote["chave_livro"] = chave_livro
 
         hashtags = gerar_hashtags(texto)
-
 
         pacote["hashtags"] = hashtags
 
@@ -763,9 +800,14 @@ async def receber_figurinha(message: Message):
         nome=nome,
         id_pedido=id_pedido,
         numero_missao=numero,
-        nome_livro=extrair_nome_livro(pedido_texto),
-        autor=extrair_autor(pedido_texto)
-    )
+        nome_livro=pacotes_pendentes[admin_id][0].get(
+            "nome_livro",
+            "Livro não informado"
+        ),
+        autor=pacotes_pendentes[admin_id][0].get(
+            "autor",
+            "Autor não informado"
+        )
 
     for indice, pacote in enumerate(pacotes_pendentes[admin_id]):
 
