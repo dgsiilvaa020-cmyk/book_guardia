@@ -252,7 +252,15 @@ def analisar_livro(caminho):
 
     idioma = descobrir_idioma(texto)
 
-    hashtags = gerar_hashtags(texto)
+    hashtags = procurar_tags_existentes(texto)
+
+
+    if not hashtags:
+
+        hashtags = gerar_hashtags(texto)
+
+
+    hashtags = garantir_hashtag(hashtags)
 
     hashtags = garantir_hashtag(hashtags)
 
