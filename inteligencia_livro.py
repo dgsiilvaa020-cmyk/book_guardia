@@ -2,19 +2,87 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 from langdetect import detect
 
-def criar_memoria_temporaria():
+def criar_memoria_livro():
 
     return {
+
+        "capitulos_analisados": 0,
 
         "generos": {},
 
         "evidencias": {},
 
-        "capitulos_lidos": 0,
+        "personagens": {},
 
-        "frases_encontradas": []
+        "frases_importantes": []
 
     }
+
+def adicionar_evidencia(memoria, genero, evidencia, peso):
+
+    if genero not in memoria["generos"]:
+
+        memoria["generos"][genero] = 0
+
+
+    memoria["generos"][genero] += peso
+
+
+    if genero not in memoria["evidencias"]:
+
+        memoria["evidencias"][genero] = []
+
+
+    memoria["evidencias"][genero].append(evidencia)
+
+
+def analisar_capitulo_memoria(texto, memoria):
+
+    texto = texto.lower()
+
+
+    memoria["capitulos_analisados"] += 1
+
+
+    # LOBISOMEM
+
+    if "alfa" in texto:
+        adicionar_evidencia(
+            memoria,
+            "#lobisomem",
+            "alfa encontrado",
+            5
+        )
+
+
+    if "matilha" in texto:
+        adicionar_evidencia(
+            memoria,
+            "#lobisomem",
+            "matilha encontrada",
+            10
+        )
+
+
+    if "transformação" in texto or "transformacao" in texto:
+        adicionar_evidencia(
+            memoria,
+            "#lobisomem",
+            "transformação encontrada",
+            10
+        )
+
+
+    # FANTASIA
+
+    if "magia" in texto:
+
+        adicionar_evidencia(
+            memoria,
+            "#fantasia",
+            "magia encontrada",
+            5
+        )
     
 
 def ler_inicio_epub(caminho):
@@ -205,6 +273,47 @@ def analisar_contexto(texto, memoria):
                 memoria["generos"][genero] = (
                     memoria["generos"].get(genero, 0) + pontos
                 )
+
+def analisar_livro_com_memoria_nova(caminho):
+
+    memoria = criar_memoria_livro()
+
+    capitulos = ler_livro_completo(caminho)
+
+
+    for capitulo in capitulos:
+
+        analisar_capitulo_memoria(
+            capitulo,
+            memoria
+        )
+
+
+    return memoria
+
+def escolher_hashtags_memoria(memoria):
+
+    generos = memoria["generos"]
+
+
+    ranking = sorted(
+        generos.items(),
+        key=lambda x:x[1],
+        reverse=True
+    )
+
+
+    hashtags = []
+
+
+    for genero, pontos in ranking:
+
+        if pontos >= 10:
+
+            hashtags.append(genero)
+
+
+    return hashtags[:3]
 
 def analisar_livro_com_memoria(caminho):
 
@@ -529,18 +638,23 @@ def garantir_hashtag(lista):
 
 def analisar_livro(caminho):
 
-    hashtags = analisar_livro_com_memoria(caminho)
+    memoria = analisar_livro_com_memoria_nova(caminho)
 
-    if not hashtags:
 
-        texto = ler_inicio_epub(caminho)
+    hashtags = escolher_hashtags_memoria(
+        memoria
+    )
 
-        hashtags = gerar_hashtags(texto)
 
-    hashtags = garantir_hashtag(hashtags)
+    hashtags = garantir_hashtag(
+        hashtags
+    )
+
 
     return {
 
-        "hashtags": hashtags
+        "hashtags": hashtags,
+
+        "memoria": memoria
 
     }
