@@ -87,13 +87,24 @@ def analisar_contexto(texto, memoria):
         "#harémreverso":[
 
             "reverse harem",
+            "reverseharem",
             "harém reverso",
             "why choose",
+            "multiple mates",
+            "mais de um companheiro",
+            "mais de um parceiro",
             "vários homens",
-            "mais de um companheiro"
+            "cinco homens",
+            "quatro homens",
+            "três homens",
+            "todos eles",
+            "eles me querem",
+            "meus companheiros",
+            "companheiros",
+            "múltiplos companheiros",
+            "multiple love interests"
 
         ],
-
 
         "#darkromance":[
 
@@ -104,27 +115,64 @@ def analisar_contexto(texto, memoria):
 
         ],
 
-
         "#fantasia":[
 
+            "fantasia",
+            "fantasy",
+            "magia",
+            "mágica",
+            "magico",
+            "mágico",
+            "feiticeiro",
+            "feiticeira",
+            "feitiço",
+            "feitiços",
+            "bruxa",
+            "bruxo",
+            "mago",
+            "reino",
+            "castelo",
+            "dragão",
+            "dragao",
+            "elfo",
+            "elfos",
+            "fada",
+            "fadas",
+            "demônio",
+            "demonio",
+            "anjo",
+            "profecia",
+            "portal",
             "mundo mágico",
-            "reino mágico",
             "criaturas sobrenaturais",
-            "poderes mágicos",
-            "feitiços"
+            "poderes mágicos"
 
         ],
-
 
         "#lobisomem":[
 
-            "se transformou em lobo",
+            "lobisomem",
+            "werewolf",
+            "alfa",
+            "beta",
+            "ômega",
+            "omega",
+            "mate",
+            "companheira destinada",
+            "companheiro destinado",
+            "matilha",
+            "alcateia",
+            "transformação",
+            "transformacao",
             "forma de lobo",
-            "lua cheia",
-            "matilha de lobos"
+            "cheiro",
+            "feromônio",
+            "feromonio",
+            "marcação",
+            "marcacao",
+            "lua cheia"
 
         ],
-
 
         "#mafia":[
 
@@ -141,22 +189,31 @@ def analisar_contexto(texto, memoria):
 
         paragrafo = paragrafo.lower()
 
-    for genero, frases in regras.items():
+for genero, palavras in regras.items():
 
-        for frase in frases:
+    pontos = 0
 
-            if frase in paragrafo:
+    for palavra in palavras:
 
-                memoria["generos"][genero] = (
-                    memoria["generos"].get(genero, 0) + 5
-                )
+        ocorrencias = texto.count(palavra)
 
-                if genero not in memoria["evidencias"]:
-                    memoria["evidencias"][genero] = []
+        if ocorrencias > 0:
 
-                memoria["evidencias"][genero].append(paragrafo[:300])
+            pontos += ocorrencias
 
-                memoria["frases_encontradas"].append(frase)
+            if genero not in memoria["evidencias"]:
+                memoria["evidencias"][genero] = []
+
+            memoria["evidencias"][genero].append(
+                f"{palavra} ({ocorrencias}x)"
+            )
+
+            memoria["frases_encontradas"].append(palavra)
+
+    if pontos > 0:
+        memoria["generos"][genero] = (
+            memoria["generos"].get(genero, 0) + pontos
+        )
 
 def analisar_livro_com_memoria(caminho):
     
@@ -197,6 +254,41 @@ def analisar_livro_com_memoria(caminho):
             capitulo,
             memoria
         )
+
+    # ===== REGRAS DE CONTEXTO =====
+
+# Lobisomem
+if (
+    memoria["generos"].get("#lobisomem", 0) >= 20
+    or (
+        "alfa" in " ".join(memoria["frases_encontradas"])
+        and "mate" in " ".join(memoria["frases_encontradas"])
+        and "matilha" in " ".join(memoria["frases_encontradas"])
+    )
+):
+    memoria["generos"]["#lobisomem"] = memoria["generos"].get("#lobisomem", 0) + 50
+
+
+# Fantasia
+if (
+    memoria["generos"].get("#fantasia", 0) >= 20
+    or (
+        "magia" in " ".join(memoria["frases_encontradas"])
+        and "reino" in " ".join(memoria["frases_encontradas"])
+    )
+):
+    memoria["generos"]["#fantasia"] = memoria["generos"].get("#fantasia", 0) + 30
+
+
+# Harém reverso
+if (
+    memoria["generos"].get("#harémreverso", 0) >= 10
+    or (
+        "why choose" in " ".join(memoria["frases_encontradas"])
+        and "companheiros" in " ".join(memoria["frases_encontradas"])
+    )
+):
+    memoria["generos"]["#harémreverso"] = memoria["generos"].get("#harémreverso", 0) + 30
 
 
     hashtags = sorted(
