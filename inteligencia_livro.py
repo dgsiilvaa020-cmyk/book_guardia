@@ -86,23 +86,14 @@ def analisar_contexto(texto, memoria):
 
         "#harémreverso":[
 
-            "reverse harem",
-            "reverseharem",
             "harém reverso",
-            "why choose",
             "multiple mates",
             "mais de um companheiro",
             "mais de um parceiro",
-            "vários homens",
-            "cinco homens",
-            "quatro homens",
-            "três homens",
-            "todos eles",
             "eles me querem",
             "meus companheiros",
             "companheiros",
             "múltiplos companheiros",
-            "multiple love interests"
 
         ],
 
@@ -359,23 +350,14 @@ def gerar_hashtags(texto):
         ],
 
         "#harémreverso":[
-            "reverse harem",
-            "reverseharem",
             "harém reverso",
-            "why choose",
             "multiple mates",
             "mais de um companheiro",
             "mais de um parceiro",
-            "vários homens",
-            "cinco homens",
-            "quatro homens",
-            "três homens",
-            "todos eles",
             "eles me querem",
             "meus companheiros",
             "companheiros",
             "múltiplos companheiros",
-            "multiple love interests"
         ],
 
         "#bdsm":[
