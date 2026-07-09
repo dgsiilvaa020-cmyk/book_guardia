@@ -776,9 +776,9 @@ async def receber_arquivo(message: Message):
 
         pacote["chave_livro"] = chave_livro
 
-        hashtags = gerar_hashtags(texto)
+        resultado = analisar_livro(caminho)
 
-        pacote["hashtags"] = hashtags
+        hashtags = resultado["hashtags"]
 
 
         print("HASHTAGS GERADAS:")
