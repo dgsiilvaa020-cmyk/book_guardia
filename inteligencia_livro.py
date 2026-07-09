@@ -482,29 +482,28 @@ def gerar_hashtags(texto):
     encontrados = []
 
 
-    for hashtag, grupos in banco.items():
+    for hashtag, frases in banco.items():
 
     pontos = 0
 
-
-    for frase in grupos["fortes"]:
-
-        if frase in texto:
-            pontos += 10
-
-
-    for frase in grupos["medias"]:
+    for frase in frases:
 
         if frase in texto:
-            pontos += 5
 
-
-    for frase in grupos["fracas"]:
-
-        if frase in texto:
             pontos += 1
-            
-            )
+
+
+    if pontos > 0:
+
+        encontrados.append(
+            (hashtag, pontos)
+        )
+
+
+    encontrados.sort(
+        key=lambda x:x[1],
+        reverse=True
+    )
 
 
         encontrados.sort(
