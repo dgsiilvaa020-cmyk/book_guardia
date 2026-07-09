@@ -507,19 +507,19 @@ def gerar_hashtags(texto):
 
 
     encontrados.sort(
-            key=lambda x:x[1],
-            reverse=True
-       )
+        key=lambda x:x[1],
+        reverse=True
+    )
 
 
        hashtags = [
             tag[0]
             for tag in encontrados[:3]
-      ]
+    ]
 
 
     # GARANTIA: sempre ter hashtag
-      if not hashtags:
+    if not hashtags:
 
         hashtags = [
             "#romance"
