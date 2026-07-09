@@ -960,6 +960,14 @@ async def receber_figurinha(message: Message):
         autor=pacotes_pendentes[admin_id][0].get(
             "autor",
             "Autor não informado"
+        ),
+        serie=pacotes_pendentes[admin_id][0].get(
+            "serie",
+            ""
+        ),
+        numero_serie=pacotes_pendentes[admin_id][0].get(
+            "numero_serie",
+            ""
         )
     )
 
@@ -977,6 +985,14 @@ async def receber_figurinha(message: Message):
             autor=pacote.get(
                 "autor",
                 "Autor não informado"
+            ),
+            serie=pacote.get(
+                "serie",
+                ""
+            ),
+            numero_serie=pacote.get(
+                "numero_serie",
+                ""
             )
         )
 
@@ -1287,8 +1303,10 @@ async def editar_msg_arquivo(callback: CallbackQuery):
         "{id_pedido} = número interno da missão\n"
         "{numero_missao} = número visual organizado\n"
         "{nome_livro} = nome do livro\n"
-        "{autor} = nome do autor\n\n"
-    )
+        "{autor} = nome do autor\n"
+        "{serie} = nome da série\n"
+        "{numero_serie} = número do livro na série\n\n"
+   )
 
 
 @dp.callback_query(F.data == "editar_msg_nao_encontrei")
