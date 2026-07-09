@@ -512,7 +512,7 @@ def gerar_hashtags(texto):
     )
 
 
-       hashtags = [
+        hashtags = [
             tag[0]
             for tag in encontrados[:3]
     ]
