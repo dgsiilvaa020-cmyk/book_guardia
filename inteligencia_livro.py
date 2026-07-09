@@ -2,91 +2,22 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 from langdetect import detect
 
-def criar_memoria_livro():
 
+def criar_memoria_temporaria():
     return {
-
-        "capitulos_analisados": 0,
 
         "generos": {},
 
         "evidencias": {},
 
-        "personagens": {},
+        "capitulos_lidos": 0,
 
-        "frases_importantes": []
+        "frases_encontradas": []
 
     }
 
-def adicionar_evidencia(memoria, genero, evidencia, peso):
-
-    if genero not in memoria["generos"]:
-
-        memoria["generos"][genero] = 0
-
-
-    memoria["generos"][genero] += peso
-
-
-    if genero not in memoria["evidencias"]:
-
-        memoria["evidencias"][genero] = []
-
-
-    memoria["evidencias"][genero].append(evidencia)
-
-
-def analisar_capitulo_memoria(texto, memoria):
-
-    texto = texto.lower()
-
-
-    memoria["capitulos_analisados"] += 1
-
-
-    # LOBISOMEM
-
-    if "alfa" in texto:
-        adicionar_evidencia(
-            memoria,
-            "#lobisomem",
-            "alfa encontrado",
-            5
-        )
-
-
-    if "matilha" in texto:
-        adicionar_evidencia(
-            memoria,
-            "#lobisomem",
-            "matilha encontrada",
-            10
-        )
-
-
-    if "transformação" in texto or "transformacao" in texto:
-        adicionar_evidencia(
-            memoria,
-            "#lobisomem",
-            "transformação encontrada",
-            10
-        )
-
-
-    # FANTASIA
-
-    if "magia" in texto:
-
-        adicionar_evidencia(
-            memoria,
-            "#fantasia",
-            "magia encontrada",
-            5
-        )
-    
 
 def ler_inicio_epub(caminho):
-
     livro = epub.read_epub(caminho)
 
     textos = []
@@ -105,7 +36,6 @@ def ler_inicio_epub(caminho):
             if texto:
                 textos.append(texto)
 
-
     texto_final = "\n".join(textos)
 
     # pega somente o começo
@@ -113,12 +43,11 @@ def ler_inicio_epub(caminho):
 
     return inicio
 
-def ler_livro_completo(caminho):
 
+def ler_livro_completo(caminho):
     livro = epub.read_epub(caminho)
 
     capitulos = []
-
 
     for item in livro.get_items():
 
@@ -129,43 +58,47 @@ def ler_livro_completo(caminho):
                 "html.parser"
             )
 
-
             texto = soup.get_text(
                 " ",
                 strip=True
             )
 
-
             if texto:
-
                 capitulos.append(texto)
-
 
     return capitulos
 
-def analisar_contexto(texto, memoria):
 
+def analisar_contexto(texto, memoria):
     texto = texto.lower()
-    
+
     paragrafos = texto.split("\n")
 
     regras = {
 
+        "#harémreverso": [
 
-        "#harémreverso":[
-
+            "reverse harem",
+            "reverseharem",
             "harém reverso",
+            "why choose",
             "multiple mates",
             "mais de um companheiro",
             "mais de um parceiro",
+            "vários homens",
+            "cinco homens",
+            "quatro homens",
+            "três homens",
+            "todos eles",
             "eles me querem",
             "meus companheiros",
             "companheiros",
             "múltiplos companheiros",
+            "multiple love interests"
 
         ],
 
-        "#darkromance":[
+        "#darkromance": [
 
             "dark romance",
             "homem possessivo",
@@ -174,7 +107,7 @@ def analisar_contexto(texto, memoria):
 
         ],
 
-        "#fantasia":[
+        "#fantasia": [
 
             "fantasia",
             "fantasy",
@@ -208,7 +141,7 @@ def analisar_contexto(texto, memoria):
 
         ],
 
-        "#lobisomem":[
+        "#lobisomem": [
 
             "lobisomem",
             "werewolf",
@@ -233,7 +166,7 @@ def analisar_contexto(texto, memoria):
 
         ],
 
-        "#mafia":[
+        "#mafia": [
 
             "chefe da máfia",
             "organização criminosa",
@@ -271,58 +204,16 @@ def analisar_contexto(texto, memoria):
 
             if pontos > 0:
                 memoria["generos"][genero] = (
-                    memoria["generos"].get(genero, 0) + pontos
+                        memoria["generos"].get(genero, 0) + pontos
                 )
 
-def analisar_livro_com_memoria_nova(caminho):
-
-    memoria = criar_memoria_livro()
-
-    capitulos = ler_livro_completo(caminho)
-
-
-    for capitulo in capitulos:
-
-        analisar_capitulo_memoria(
-            capitulo,
-            memoria
-        )
-
-
-    return memoria
-
-def escolher_hashtags_memoria(memoria):
-
-    generos = memoria["generos"]
-
-
-    ranking = sorted(
-        generos.items(),
-        key=lambda x:x[1],
-        reverse=True
-    )
-
-
-    hashtags = []
-
-
-    for genero, pontos in ranking:
-
-        if pontos >= 10:
-
-            hashtags.append(genero)
-
-
-    return hashtags[:3]
 
 def analisar_livro_com_memoria(caminho):
-
     memoria = criar_memoria_temporaria()
 
     capitulos = ler_livro_completo(caminho)
 
     for capitulo in capitulos:
-
         memoria["capitulos_lidos"] += 1
 
         analisar_contexto(capitulo, memoria)
@@ -331,32 +222,32 @@ def analisar_livro_com_memoria(caminho):
 
     # Lobisomem
     if (
-        memoria["generos"].get("#lobisomem", 0) >= 20
-        or (
+            memoria["generos"].get("#lobisomem", 0) >= 20
+            or (
             "alfa" in " ".join(memoria["frases_encontradas"])
             and "mate" in " ".join(memoria["frases_encontradas"])
             and "matilha" in " ".join(memoria["frases_encontradas"])
-        )
+    )
     ):
         memoria["generos"]["#lobisomem"] = memoria["generos"].get("#lobisomem", 0) + 50
 
     # Fantasia
     if (
-        memoria["generos"].get("#fantasia", 0) >= 20
-        or (
+            memoria["generos"].get("#fantasia", 0) >= 20
+            or (
             "magia" in " ".join(memoria["frases_encontradas"])
             and "reino" in " ".join(memoria["frases_encontradas"])
-        )
+    )
     ):
         memoria["generos"]["#fantasia"] = memoria["generos"].get("#fantasia", 0) + 30
 
     # Harém reverso
     if (
-        memoria["generos"].get("#harémreverso", 0) >= 10
-        or (
+            memoria["generos"].get("#harémreverso", 0) >= 10
+            or (
             "why choose" in " ".join(memoria["frases_encontradas"])
             and "companheiros" in " ".join(memoria["frases_encontradas"])
-        )
+    )
     ):
         memoria["generos"]["#harémreverso"] = memoria["generos"].get("#harémreverso", 0) + 30
 
@@ -372,13 +263,13 @@ def analisar_livro_com_memoria(caminho):
 
     return resultado
 
-def gerar_hashtags(texto):
 
+def gerar_hashtags(texto):
     texto = texto.lower()
 
     banco = {
 
-        "#darkromance":[
+        "#darkromance": [
             "dark romance",
             "relacao obsessiva",
             "amor sombrio",
@@ -391,7 +282,7 @@ def gerar_hashtags(texto):
             "obsession"
         ],
 
-        "#mafia":[
+        "#mafia": [
             "máfia",
             "mafia",
             "mafioso",
@@ -412,68 +303,46 @@ def gerar_hashtags(texto):
             "don da máfia"
         ],
 
-        "#bdsm":[
+        "#bdsm": [
             "bdsm"
         ],
 
-        "#romance":[
+        "#romance": [
             "romance",
             "amor",
             "love"
         ],
 
-        "#fantasia":[
+        "#fantasia": [
             "fantasia",
             "fantasy",
+            "mundo magico",
             "magia",
-            "mágica",
-            "magico",
-            "mágico",
-            "feiticeiro",
-            "feiticeira",
-            "feitiço",
-            "feitiços",
-            "bruxa",
-            "bruxo",
-            "mago",
-            "reino",
-            "castelo",
-            "dragão",
-            "dragao",
-            "elfo",
-            "elfos",
-            "fada",
-            "fadas",
-            "demônio",
-            "demonio",
-            "anjo",
-            "profecia",
-            "portal",
-            "mundo mágico",
+            "reino mágico",
+            "reino encantado",
             "criaturas sobrenaturais",
-            "poderes mágicos"
+            "poderes magicos",
+            "feiticos",
+            "profecia antiga",
+            "guerra entre reinos"
         ],
 
-        "#romantasia":[
+        "#romantasia": [
             "romantasia"
         ],
 
-        "#harémreverso":[
+        "#harémreverso": [
+            "reverse harem",
+            "reverseharem",
             "harém reverso",
-            "multiple mates",
-            "mais de um companheiro",
-            "mais de um parceiro",
-            "eles me querem",
-            "meus companheiros",
-            "companheiros",
-            "múltiplos companheiros",
+            "why choose"
         ],
 
-        "#bdsm":[
+        "#bdsm": [
             "bdsm"
         ],
 
-        "#vampiro":[
+        "#vampiro": [
             "vampiro",
             "vampire",
             "mordida no pescoco",
@@ -481,89 +350,74 @@ def gerar_hashtags(texto):
             "imortal da noite"
         ],
 
-        "#lobisomem":[
+        "#lobisomem": [
             "lobisomem",
             "werewolf",
-            "alfa",
-            "beta",
-            "ômega",
-            "omega",
-            "mate",
-            "companheira destinada",
-            "companheiro destinado",
-            "matilha",
-            "alcateia",
-            "transformação",
-            "transformacao",
-            "forma de lobo",
-            "cheiro",
-            "feromônio",
-            "feromonio",
-            "marcação",
-            "marcacao",
+            "homem lobo",
+            "transformacao em lobo",
             "lua cheia"
         ],
 
-        "#bruxas":[
+        "#bruxas": [
             "bruxa",
             "witch"
         ],
 
-        "#bilionario":[
+        "#bilionario": [
             "bilionário",
             "billionaire",
             "ceo"
         ],
 
-        "#faculdade":[
+        "#faculdade": [
             "college",
             "campus",
             "universidade",
             "faculdade"
         ],
 
-        "#MMRomance":[
+        "#MMRomance": [
             "mm romance",
             "male/male"
         ],
 
-        "#FFRomance":[
+        "#FFRomance": [
             "ff romance",
             "female/female"
         ],
 
-        "#gravidezinesperada":[
+        "#gravidezinesperada": [
             "gravidez inesperada",
             "unexpected pregnancy"
         ],
 
-        "#gravidez":[
-            "gravidez", 
+        "#gravidez": [
+            "gravidez",
             "bebê",
             "baby"
         ],
 
-        "#enemiestolovers":[
+        "#enemiestolovers": [
             "enemies to lovers"
         ],
 
-        "#friendstolovers":[
+        "#friendstolovers": [
             "friends to lovers"
         ],
 
-        "#slowburn":[
+        "#slowburn": [
             "slow burn"
         ],
 
-        "#arrangedmarriage":[
+        "#arrangedmarriage": [
             "arranged marriage"
         ],
 
-        "#marriageofconvenience":[
+        "#marriageofconvenience": [
             "marriage of convenience"
         ],
 
-        "#fatedmates":[
+        "#fatedmates": [
             "fated mates",
             "soulmates",
             "companheira destinada"
@@ -572,7 +426,6 @@ def gerar_hashtags(texto):
 
     encontrados = []
 
-
     for hashtag, frases in banco.items():
 
         pontos = 0
@@ -580,48 +433,33 @@ def gerar_hashtags(texto):
         for frase in frases:
 
             if frase in texto:
+                pontos += 1
 
-               pontos += 1
-
-
-        if pontos > 0:
-
+        if pontos >= 1:
             encontrados.append(
                 (hashtag, pontos)
             )
 
-
-    encontrados.sort(
-        key=lambda x:x[1],
-        reverse=True
-    )
-
-
-    encontrados.sort(
-        key=lambda x:x[1],
-        reverse=True
-    )
-
+        encontrados.sort(
+            key=lambda x: x[1],
+            reverse=True
+        )
 
     hashtags = [
         tag[0]
         for tag in encontrados[:3]
     ]
 
-
     # GARANTIA: sempre ter hashtag
     if not hashtags:
-
         hashtags = [
             "#romance"
         ]
-
 
     return hashtags
 
 
 def garantir_hashtag(lista):
-
     lista_final = []
 
     for tag in lista:
@@ -636,25 +474,19 @@ def garantir_hashtag(lista):
 
     return lista_final[:3]
 
+
 def analisar_livro(caminho):
+    hashtags = analisar_livro_com_memoria(caminho)
 
-    memoria = analisar_livro_com_memoria_nova(caminho)
+    if not hashtags:
+        texto = ler_inicio_epub(caminho)
 
+        hashtags = gerar_hashtags(texto)
 
-    hashtags = escolher_hashtags_memoria(
-        memoria
-    )
-
-
-    hashtags = garantir_hashtag(
-        hashtags
-    )
-
+    hashtags = garantir_hashtag(hashtags)
 
     return {
 
-        "hashtags": hashtags,
-
-        "memoria": memoria
+        "hashtags": hashtags
 
     }
