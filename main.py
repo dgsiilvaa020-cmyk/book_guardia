@@ -19,6 +19,35 @@ from inteligencia_livro import (
     analisar_livro
 )
 
+from ebooklib import epub
+from bs4 import BeautifulSoup
+
+
+def ler_primeiras_paginas(caminho, limite=5):
+    livro = epub.read_epub(caminho)
+
+    paginas = []
+
+    for item in livro.get_items():
+
+        if item.get_type() == 9:
+
+            soup = BeautifulSoup(
+                item.get_content(),
+                "html.parser"
+            )
+
+            texto = soup.get_text(" ", strip=True)
+
+            if texto:
+
+                paginas.append(texto)
+
+            if len(paginas) >= limite:
+                break
+
+    return "\n".join(paginas)
+
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMINS = [8672397104]  # coloque seu ID aqui
