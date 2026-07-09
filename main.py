@@ -776,6 +776,8 @@ async def receber_arquivo(message: Message):
 
         dados = extrair_dados_livro_epub(caminho)
 
+        print(dados)
+
         pacote["nome_livro"] = dados["nome_livro"]
         pacote["autor"] = dados["autor"]
         pacote["serie"] = dados["serie"]
