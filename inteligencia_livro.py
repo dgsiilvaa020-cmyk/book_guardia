@@ -216,80 +216,49 @@ for genero, palavras in regras.items():
         )
 
 def analisar_livro_com_memoria(caminho):
-    
 
-    memoria = {
-
-    "generos": {},
-
-    "evidencias": {},
-
-    "capitulos_lidos": 0,
-
-    "frases_encontradas": [],
-
-    "personagens": set(),
-
-    "criaturas": set(),
-
-    "locais": set(),
-
-    "relacionamentos": [],
-
-    "objetos_magicos": set(),
-
-    "eventos": []
-
-}
-
+    memoria = criar_memoria_temporaria()
 
     capitulos = ler_livro_completo(caminho)
-
 
     for capitulo in capitulos:
 
         memoria["capitulos_lidos"] += 1
 
-        analisar_contexto(
-            capitulo,
-            memoria
-        )
+        analisar_contexto(capitulo, memoria)
 
     # ===== REGRAS DE CONTEXTO =====
 
-# Lobisomem
-if (
-    memoria["generos"].get("#lobisomem", 0) >= 20
-    or (
-        "alfa" in " ".join(memoria["frases_encontradas"])
-        and "mate" in " ".join(memoria["frases_encontradas"])
-        and "matilha" in " ".join(memoria["frases_encontradas"])
-    )
-):
-    memoria["generos"]["#lobisomem"] = memoria["generos"].get("#lobisomem", 0) + 50
+    # Lobisomem
+    if (
+        memoria["generos"].get("#lobisomem", 0) >= 20
+        or (
+            "alfa" in " ".join(memoria["frases_encontradas"])
+            and "mate" in " ".join(memoria["frases_encontradas"])
+            and "matilha" in " ".join(memoria["frases_encontradas"])
+        )
+    ):
+        memoria["generos"]["#lobisomem"] = memoria["generos"].get("#lobisomem", 0) + 50
 
+    # Fantasia
+    if (
+        memoria["generos"].get("#fantasia", 0) >= 20
+        or (
+            "magia" in " ".join(memoria["frases_encontradas"])
+            and "reino" in " ".join(memoria["frases_encontradas"])
+        )
+    ):
+        memoria["generos"]["#fantasia"] = memoria["generos"].get("#fantasia", 0) + 30
 
-# Fantasia
-if (
-    memoria["generos"].get("#fantasia", 0) >= 20
-    or (
-        "magia" in " ".join(memoria["frases_encontradas"])
-        and "reino" in " ".join(memoria["frases_encontradas"])
-    )
-):
-    memoria["generos"]["#fantasia"] = memoria["generos"].get("#fantasia", 0) + 30
-
-
-# Harém reverso
-if (
-    memoria["generos"].get("#harémreverso", 0) >= 10
-    or (
-        "why choose" in " ".join(memoria["frases_encontradas"])
-        and "companheiros" in " ".join(memoria["frases_encontradas"])
-    )
-):
-    memoria["generos"]["#harémreverso"] = memoria["generos"].get("#harémreverso", 0) + 30
-
+    # Harém reverso
+    if (
+        memoria["generos"].get("#harémreverso", 0) >= 10
+        or (
+            "why choose" in " ".join(memoria["frases_encontradas"])
+            and "companheiros" in " ".join(memoria["frases_encontradas"])
+        )
+    ):
+        memoria["generos"]["#harémreverso"] = memoria["generos"].get("#harémreverso", 0) + 30
 
     hashtags = sorted(
         memoria["generos"],
@@ -297,12 +266,9 @@ if (
         reverse=True
     )
 
-
     resultado = hashtags[:3]
 
-
     memoria.clear()
-
 
     return resultado
 
