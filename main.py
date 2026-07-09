@@ -763,7 +763,6 @@ async def receber_arquivo(message: Message):
 
         pacote["nome_livro"] = dados["nome_livro"]
         pacote["autor"] = dados["autor"]
-        pacote["título"] = dados["título"]
 
         chave_livro = remover_acentos(
             nome_livro_epub.lower()
