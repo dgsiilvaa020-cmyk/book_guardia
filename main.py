@@ -230,6 +230,12 @@ def extrair_dados_livro_epub(caminho):
     try:
         livro = epub.read_epub(caminho)
 
+        texto_inicio = ler_primeiras_paginas(caminho)
+
+        print("========== INÍCIO DO EPUB ==========")
+        print(texto_inicio[:5000])
+        print("===================================")
+
         titulo = None
         autor = None
 
