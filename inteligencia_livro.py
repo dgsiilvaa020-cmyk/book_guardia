@@ -204,27 +204,27 @@ def gerar_hashtags(texto):
             )
 
 
-    encontrados.sort(
+        encontrados.sort(
         key=lambda x:x[1],
         reverse=True
     )
 
 
-    return [
+    hashtags = [
         tag[0]
         for tag in encontrados[:3]
     ]
-    
-def descobrir_idioma(texto):
 
-    try:
 
-        idioma = detect(texto)
+    # GARANTIA: sempre ter hashtag
+    if not hashtags:
 
-        if idioma == "en":
-            return "EN"
+        hashtags = [
+            "#romance"
+        ]
 
-        return "PT"
+
+    return hashtags
 
     except:
 
@@ -243,6 +243,25 @@ def descobrir_idioma(texto):
 
     return resultado[:3]
 
+def garantir_hashtag(lista):
+
+    lista_final = []
+
+    for tag in lista:
+
+        if not tag.startswith("#"):
+            tag = "#" + tag
+
+        lista_final.append(tag)
+
+
+    if not lista_final:
+        lista_final.append("#romance")
+
+
+    return lista_final[:3]
+    
+
 def analisar_livro(caminho):
 
     texto = ler_inicio_epub(caminho)
@@ -250,6 +269,8 @@ def analisar_livro(caminho):
     idioma = descobrir_idioma(texto)
 
     hashtags = gerar_hashtags(texto)
+
+    hashtags = garantir_hashtag(hashtags)
 
 
     return {
