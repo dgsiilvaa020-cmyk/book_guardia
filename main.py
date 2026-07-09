@@ -16,6 +16,7 @@ from bs4 import BeautifulSoup
 from inteligencia_livro import (
     ler_inicio_epub,
     gerar_hashtags
+    analisar_livro
 )
 
 
@@ -780,6 +781,7 @@ async def receber_arquivo(message: Message):
 
         hashtags = resultado["hashtags"]
 
+        pacote["hashtags"] = hashtags
 
         print("HASHTAGS GERADAS:")
         print(hashtags)
