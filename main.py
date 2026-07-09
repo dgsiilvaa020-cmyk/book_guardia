@@ -27,7 +27,7 @@ ADMINS = [8672397104]  # coloque seu ID aqui
 GRUPO_PEDIDOS = -1003609010797
 
 # Grupo onde os Guardiões publicam os livros
-GRUPO_ACERVO = -1004464402585
+GRUPO_ACERVO = -1004348688790
 
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher()
