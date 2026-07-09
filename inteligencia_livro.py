@@ -39,6 +39,12 @@ def gerar_hashtags(texto):
 
         "#darkromance":[
             "dark romance",
+            "relacao obsessiva",
+            "amor sombrio",
+            "homem possessivo",
+            "homem perigoso",
+            "ele nao consegue deixa la ir",
+            "obsessao por ela"
             "dark",
             "obsessão",
             "obsession"
@@ -51,6 +57,18 @@ def gerar_hashtags(texto):
             "bratva",
             "camorra",
             "cartel"
+            "família mafiosa",
+            "império da máfia",
+            "chefe da máfia",
+            "líder da máfia",
+            "submundo criminoso",
+            "organização criminosa",
+            "cartel de drogas",
+            "família italiana",
+            "clã mafioso",
+            "bratva russa",
+            "rei da máfia",
+            "don da máfia"
         ],
 
         "#harémreverso":[
@@ -72,6 +90,13 @@ def gerar_hashtags(texto):
         "#fantasia":[
             "fantasia",
             "fantasy"
+            "mundo magico",
+            "reino encantado",
+            "criaturas sobrenaturais",
+            "poderes magicos",
+            "feiticos",
+            "profecia antiga",
+            "guerra entre reinos"
         ],
 
         "#romantasia":[
@@ -81,23 +106,22 @@ def gerar_hashtags(texto):
         "#vampiro":[
             "vampiro",
             "vampire"
+            "mordida no pescoco",
+            "sede de sangue",
+            "imortal da noite"
         ],
 
         "#lobisomem":[
             "lobisomem",
             "werewolf"
+            "homem lobo",
+            "transformacao em lobo",
+            "lua cheia"
         ],
 
         "#bruxas":[
             "bruxa",
             "witch"
-        ],
-
-        "#realeza":[
-            "rei",
-            "rainha",
-            "princesa",
-            "príncipe"
         ],
 
         "#bilionario":[
@@ -128,7 +152,8 @@ def gerar_hashtags(texto):
             "unexpected pregnancy"
         ],
 
-        "#bebê":[
+        "#gravidez":[
+            "gravidez" 
             "bebê",
             "baby"
         ],
@@ -156,23 +181,40 @@ def gerar_hashtags(texto):
         "#fatedmates":[
             "fated mates",
             "soulmates"
+            "companheira destinada"
         ]
     }
 
     encontrados = []
 
-    for hashtag, palavras in banco.items():
 
-        for palavra in palavras:
+    for hashtag, frases in banco.items():
 
-            if palavra in texto:
+        pontos = 0
 
-                encontrados.append(hashtag)
+        for frase in frases:
 
-                break
+            if frase in texto:
+                pontos += 1
 
-    return encontrados[:3]
 
+        if pontos >= 1:
+            encontrados.append(
+                (hashtag, pontos)
+            )
+
+
+    encontrados.sort(
+        key=lambda x:x[1],
+        reverse=True
+    )
+
+
+    return [
+        tag[0]
+        for tag in encontrados[:3]
+    ]
+    
 def descobrir_idioma(texto):
 
     try:
