@@ -8,131 +8,13 @@ def criar_memoria_temporaria():
 
         "generos": {},
 
-        "evidencias": {}
+        "evidencias": {},
+
+        "capitulos_lidos": 0,
+
+        "frases_encontradas": []
 
     }
-
-def extrair_sinopse_epub(caminho):
-
-    livro = epub.read_epub(caminho)
-
-    textos = []
-
-
-    # 1 - tenta pegar descrição do EPUB
-    for chave, valores in livro.metadata.items():
-
-        for valor in valores:
-
-            if isinstance(valor, tuple):
-
-                texto = valor[0]
-
-                if texto:
-                    textos.append(texto)
-
-
-
-    # 2 - procura páginas de sinopse
-    for item in livro.get_items():
-
-        if item.get_type() == 9:
-
-            soup = BeautifulSoup(
-                item.get_content(),
-                "html.parser"
-            )
-
-
-            texto = soup.get_text(
-                " ",
-                strip=True
-            )
-
-
-            texto_lower = texto.lower()
-
-
-            palavras_sinopse = [
-                "sinopse",
-                "synopsis",
-                "description",
-                "sobre este livro"
-            ]
-
-
-            for palavra in palavras_sinopse:
-
-                if palavra in texto_lower:
-
-                    textos.append(texto[:5000])
-
-
-
-    return " ".join(textos)
-
-def analisar_sinopse(texto):
-
-    texto = texto.lower()
-
-
-    hashtags = []
-
-
-    regras = {
-
-
-        "#harémreverso":[
-            "reverse harem",
-            "reverseharem",
-            "harém reverso",
-            "why choose"
-        ],
-
-
-        "#darkromance":[
-            "dark romance",
-            "darkromance"
-        ],
-
-
-        "#bdsm":[
-            "bdsm"
-        ],
-
-
-        "#fantasia":[
-            "fantasy",
-            "fantasia",
-            "magia",
-            "reino mágico",
-            "criaturas sobrenaturais"
-        ],
-
-
-        "#mafia":[
-            "mafia",
-            "mafioso",
-            "bratva",
-            "camorra"
-        ]
-
-    }
-
-
-
-    for hashtag, palavras in regras.items():
-
-        for palavra in palavras:
-
-            if palavra in texto:
-
-                hashtags.append(hashtag)
-                break
-
-
-
-    return hashtags
     
 
 def ler_inicio_epub(caminho):
@@ -276,16 +158,43 @@ def analisar_contexto(texto, memoria):
 
 
                 memoria["evidencias"][genero].append(frase)
+                
+                memoria["frases_encontradas"].append(frase)
 
 def analisar_livro_com_memoria(caminho):
+    
 
-    memoria = criar_memoria_temporaria()
+    memoria = {
+
+    "generos": {},
+
+    "evidencias": {},
+
+    "capitulos_lidos": 0,
+
+    "frases_encontradas": [],
+
+    "personagens": set(),
+
+    "criaturas": set(),
+
+    "locais": set(),
+
+    "relacionamentos": [],
+
+    "objetos_magicos": set(),
+
+    "eventos": []
+
+}
 
 
     capitulos = ler_livro_completo(caminho)
 
 
     for capitulo in capitulos:
+
+        memoria["capitulos_lidos"] += 1
 
         analisar_contexto(
             capitulo,
@@ -348,12 +257,6 @@ def gerar_hashtags(texto):
             "don da máfia"
         ],
 
-        "#harémreverso":[
-            "reverse harem",
-            "harém reverso",
-            "why choose"
-        ],
-
         "#bdsm":[
             "bdsm"
         ],
@@ -368,6 +271,8 @@ def gerar_hashtags(texto):
             "fantasia",
             "fantasy",
             "mundo magico",
+            "magia",
+            "reino mágico",
             "reino encantado",
             "criaturas sobrenaturais",
             "poderes magicos",
@@ -378,6 +283,17 @@ def gerar_hashtags(texto):
 
         "#romantasia":[
             "romantasia"
+        ],
+
+        "#harémreverso":[
+            "reverse harem",
+            "reverseharem",
+            "harém reverso",
+            "why choose"
+        ],
+
+        "#bdsm":[
+            "bdsm"
         ],
 
         "#vampiro":[
@@ -515,46 +431,25 @@ def garantir_hashtag(lista):
 
         lista_final.append(tag)
 
-
     if not lista_final:
         lista_final.append("#romance")
 
-
     return lista_final[:3]
-    
 
 def analisar_livro(caminho):
 
-    texto = ler_inicio_epub(caminho)
-
-    idioma = descobrir_idioma(texto)
-
-
     hashtags = analisar_livro_com_memoria(caminho)
 
-
     if not hashtags:
 
-        hashtags = procurar_tags_existentes(texto)
-
-
-    if not hashtags:
+        texto = ler_inicio_epub(caminho)
 
         hashtags = gerar_hashtags(texto)
 
-
     hashtags = garantir_hashtag(hashtags)
 
-
     return {
-        "idioma": idioma,
+
         "hashtags": hashtags
-    }
 
-    hashtags = garantir_hashtag(hashtags)
-
-
-    return {
-        "idioma": idioma,
-        "hashtags": hashtags
     }
