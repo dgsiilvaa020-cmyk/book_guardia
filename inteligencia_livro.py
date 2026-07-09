@@ -506,7 +506,7 @@ def gerar_hashtags(texto):
     )
 
 
-        encontrados.sort(
+    encontrados.sort(
             key=lambda x:x[1],
             reverse=True
        )
