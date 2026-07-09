@@ -139,7 +139,7 @@ def analisar_contexto(texto, memoria):
 
     for paragrafo in paragrafos:
 
-    paragrafo = paragrafo.lower()
+        paragrafo = paragrafo.lower()
 
     for genero, frases in regras.items():
 
