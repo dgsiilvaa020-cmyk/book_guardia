@@ -68,219 +68,38 @@ def ler_livro_completo(caminho):
 
     return capitulos
 
-
 def analisar_contexto(texto, memoria):
+
     texto = texto.lower()
 
-    paragrafos = texto.split("\n")
 
     regras = {
 
-        "#harémreverso": [
-
-            "reverse harem",
-            "reverseharem",
-            "harém reverso",
-            "why choose",
-            "multiple mates",
-            "mais de um companheiro",
-            "mais de um parceiro",
-            "vários homens",
-            "cinco homens",
-            "quatro homens",
-            "três homens",
-            "todos eles",
-            "eles me querem",
-            "meus companheiros",
-            "companheiros",
-            "múltiplos companheiros",
-            "multiple love interests"
-
-        ],
-
-        "#darkromance": [
-
-            "dark romance",
-            "homem possessivo",
-            "relacionamento obsessivo",
-            "amor sombrio"
-
-        ],
+        # =====================
+        # GÊNEROS PRINCIPAIS
+        # =====================
 
         "#fantasia": [
-
             "fantasia",
             "fantasy",
             "magia",
             "mágica",
-            "magico",
-            "mágico",
-            "feiticeiro",
-            "feiticeira",
             "feitiço",
-            "feitiços",
-            "bruxa",
-            "bruxo",
-            "mago",
-            "reino",
-            "castelo",
-            "dragão",
-            "dragao",
-            "elfo",
-            "elfos",
-            "fada",
-            "fadas",
-            "demônio",
-            "demonio",
-            "anjo",
-            "profecia",
-            "portal",
-            "mundo mágico",
+            "feitico",
+            "reino mágico",
+            "reino encantado",
             "criaturas sobrenaturais",
-            "poderes mágicos"
-
-        ],
-
-        "#lobisomem": [
-
+            "poderes mágicos",
+            "profecia",
+            "dragão",
+            "dragão",
+            "vampiro",
             "lobisomem",
-            "werewolf",
-            "alfa",
-            "beta",
-            "ômega",
-            "omega",
-            "mate",
-            "companheira destinada",
-            "companheiro destinado",
-            "matilha",
-            "alcateia",
-            "transformação",
-            "transformacao",
-            "forma de lobo",
-            "cheiro",
-            "feromônio",
-            "feromonio",
-            "marcação",
-            "marcacao",
-            "lua cheia"
-
+            "bruxa",
+            "feérico",
+            "fae"
         ],
 
-        "#mafia": [
-
-            "chefe da máfia",
-            "organização criminosa",
-            "família mafiosa",
-            "submundo criminoso"
-
-        ]
-
-    }
-
-    for paragrafo in paragrafos:
-
-        paragrafo = paragrafo.lower()
-
-        for genero, palavras in regras.items():
-
-            pontos = 0
-
-            for palavra in palavras:
-
-                ocorrencias = paragrafo.count(palavra)
-
-                if ocorrencias > 0:
-
-                    pontos += ocorrencias
-
-                    if genero not in memoria["evidencias"]:
-                        memoria["evidencias"][genero] = []
-
-                    memoria["evidencias"][genero].append(
-                        f"{palavra} ({ocorrencias}x)"
-                    )
-
-                    memoria["frases_encontradas"].append(palavra)
-
-            if pontos > 0:
-                memoria["generos"][genero] = (
-                        memoria["generos"].get(genero, 0) + pontos
-                )
-
-
-def analisar_livro_com_memoria(caminho):
-    memoria = criar_memoria_temporaria()
-
-    capitulos = ler_livro_completo(caminho)
-
-    for capitulo in capitulos:
-        memoria["capitulos_lidos"] += 1
-
-        analisar_contexto(capitulo, memoria)
-
-    # ===== REGRAS DE CONTEXTO =====
-
-    # Lobisomem
-    if (
-            memoria["generos"].get("#lobisomem", 0) >= 20
-            or (
-            "alfa" in " ".join(memoria["frases_encontradas"])
-            and "mate" in " ".join(memoria["frases_encontradas"])
-            and "matilha" in " ".join(memoria["frases_encontradas"])
-    )
-    ):
-        memoria["generos"]["#lobisomem"] = memoria["generos"].get("#lobisomem", 0) + 50
-
-    # Fantasia
-    if (
-            memoria["generos"].get("#fantasia", 0) >= 20
-            or (
-            "magia" in " ".join(memoria["frases_encontradas"])
-            and "reino" in " ".join(memoria["frases_encontradas"])
-    )
-    ):
-        memoria["generos"]["#fantasia"] = memoria["generos"].get("#fantasia", 0) + 30
-
-    # Harém reverso
-    if (
-            memoria["generos"].get("#harémreverso", 0) >= 10
-            or (
-            "why choose" in " ".join(memoria["frases_encontradas"])
-            and "companheiros" in " ".join(memoria["frases_encontradas"])
-    )
-    ):
-        memoria["generos"]["#harémreverso"] = memoria["generos"].get("#harémreverso", 0) + 30
-
-    hashtags = sorted(
-        memoria["generos"],
-        key=memoria["generos"].get,
-        reverse=True
-    )
-
-    resultado = hashtags[:3]
-
-    memoria.clear()
-
-    return resultado
-
-
-def gerar_hashtags(texto):
-    texto = texto.lower()
-
-    banco = {
-
-        "#darkromance": [
-            "dark romance",
-            "relacao obsessiva",
-            "amor sombrio",
-            "homem possessivo",
-            "homem perigoso",
-            "ele nao consegue deixa la ir",
-            "obsessao por ela",
-            "dark",
-            "obsessão",
-            "obsession"
-        ],
 
         "#mafia": [
             "máfia",
@@ -290,22 +109,220 @@ def gerar_hashtags(texto):
             "camorra",
             "cartel",
             "família mafiosa",
-            "império da máfia",
             "chefe da máfia",
-            "líder da máfia",
-            "submundo criminoso",
+            "don da máfia",
             "organização criminosa",
-            "cartel de drogas",
-            "família italiana",
-            "clã mafioso",
-            "bratva russa",
-            "rei da máfia",
-            "don da máfia"
+            "submundo criminoso"
         ],
 
-        "#bdsm": [
-            "bdsm"
+
+        "#darkromance": [
+            "dark romance",
+            "homem possessivo",
+            "obsessão por ela",
+            "amor sombrio",
+            "homem perigoso",
+            "relacionamento obsessivo"
         ],
+
+
+        "#romance": [
+            "romance",
+            "amor",
+            "love",
+            "apaixonado",
+            "apaixonada"
+        ],
+
+
+
+        # =====================
+        # ELEMENTOS DE FANTASIA
+        # =====================
+
+
+        "#dragao": [
+            "dragão",
+            "dragões",
+            "dragon",
+            "dragons",
+            "montador de dragão",
+            "cavaleiro de dragão"
+        ],
+
+
+        "#vampiro": [
+            "vampiro",
+            "vampira",
+            "vampire",
+            "sede de sangue",
+            "imortal da noite",
+            "mordida no pescoço"
+        ],
+
+
+        "#lobisomem": [
+            "lobisomem",
+            "werewolf",
+            "homem lobo",
+            "matilha",
+            "alcateia",
+            "alfa da matilha"
+        ],
+
+
+        "#bruxas": [
+            "bruxa",
+            "bruxas",
+            "witch",
+            "feiticeira",
+            "feiticeiro"
+        ],
+
+
+        "#feericos": [
+            "feérico",
+            "feéricos",
+            "fae",
+            "fey",
+            "fairy",
+            "fadas",
+            "corte feérica",
+            "reino feérico"
+        ],
+
+
+
+        # =====================
+        # ROMANCES ESPECÍFICOS
+        # =====================
+
+
+        "#harémreverso": [
+            "reverse harem",
+            "reverseharem",
+            "harém reverso",
+            "why choose",
+            "multiple love interests"
+        ],
+
+
+        "#bilionario": [
+            "bilionário",
+            "billionaire",
+            "ceo"
+        ]
+
+    }
+
+
+    for genero, palavras in regras.items():
+
+        pontos = 0
+
+
+        for palavra in palavras:
+
+            quantidade = texto.count(palavra)
+
+            pontos += quantidade
+
+
+        if pontos > 0:
+
+            memoria["generos"][genero] = (
+                memoria["generos"].get(genero, 0)
+                + pontos
+            )
+
+def analisar_livro_com_memoria(caminho):
+
+    memoria = criar_memoria_temporaria()
+
+    capitulos = ler_livro_completo(caminho)
+
+    for capitulo in capitulos:
+        analisar_contexto(capitulo, memoria)
+
+
+    generos = memoria["generos"]
+
+
+    hashtags = []
+
+
+    # ==========================
+    # GÊNERO PRINCIPAL
+    # ==========================
+
+    if generos.get("#fantasia", 0) >= 15:
+
+        hashtags.append("#fantasia")
+
+        elementos = [
+
+            "#dragao",
+            "#vampiro",
+            "#lobisomem",
+            "#bruxas",
+            "#feericos"
+
+        ]
+
+        elementos.sort(
+            key=lambda x: generos.get(x, 0),
+            reverse=True
+        )
+
+        for tag in elementos:
+
+            if generos.get(tag, 0) > 0:
+
+                hashtags.append(tag)
+
+            if len(hashtags) == 3:
+                break
+
+
+    elif generos.get("#mafia", 0) >= 8:
+
+        hashtags.append("#mafia")
+
+        if generos.get("#darkromance", 0) > 0:
+            hashtags.append("#darkromance")
+
+        if generos.get("#romance", 0) > 0:
+            hashtags.append("#romance")
+
+
+    else:
+
+        ordem = sorted(
+            generos.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )
+
+        for tag, _ in ordem:
+
+            hashtags.append(tag)
+
+            if len(hashtags) == 3:
+                break
+
+
+    memoria.clear()
+
+    return hashtags[:3]
+
+
+def gerar_hashtags(texto):
+
+    texto = texto.lower()
+
+    pontos = {}
+
+    banco = {
 
         "#romance": [
             "romance",
@@ -313,148 +330,68 @@ def gerar_hashtags(texto):
             "love"
         ],
 
+        "#darkromance": [
+            "dark romance",
+            "obsessão",
+            "homem possessivo",
+            "amor sombrio"
+        ],
+
+        "#mafia": [
+            "máfia",
+            "mafia",
+            "mafioso",
+            "bratva",
+            "camorra"
+        ],
+
         "#fantasia": [
             "fantasia",
-            "fantasy",
-            "mundo magico",
             "magia",
-            "reino mágico",
-            "reino encantado",
-            "criaturas sobrenaturais",
-            "poderes magicos",
-            "feiticos",
-            "profecia antiga",
-            "guerra entre reinos"
-        ],
-
-        "#romantasia": [
-            "romantasia"
-        ],
-
-        "#harémreverso": [
-            "reverse harem",
-            "reverseharem",
-            "harém reverso",
-            "why choose"
-        ],
-
-        "#bdsm": [
-            "bdsm"
-        ],
-
-        "#vampiro": [
+            "dragão",
+            "dragao",
             "vampiro",
-            "vampire",
-            "mordida no pescoco",
-            "sede de sangue",
-            "imortal da noite"
-        ],
-
-        "#lobisomem": [
             "lobisomem",
-            "werewolf",
-            "homem lobo",
-            "transformacao em lobo",
-            "lua cheia"
-        ],
-
-        "#bruxas": [
             "bruxa",
-            "witch"
-        ],
-
-        "#bilionario": [
-            "bilionário",
-            "billionaire",
-            "ceo"
-        ],
-
-        "#faculdade": [
-            "college",
-            "campus",
-            "universidade",
-            "faculdade"
-        ],
-
-        "#MMRomance": [
-            "mm romance",
-            "male/male"
-        ],
-
-        "#FFRomance": [
-            "ff romance",
-            "female/female"
-        ],
-
-        "#gravidezinesperada": [
-            "gravidez inesperada",
-            "unexpected pregnancy"
-        ],
-
-        "#gravidez": [
-            "gravidez",
-            "bebê",
-            "baby"
-        ],
-
-        "#enemiestolovers": [
-            "enemies to lovers"
-        ],
-
-        "#friendstolovers": [
-            "friends to lovers"
-        ],
-
-        "#slowburn": [
-            "slow burn"
-        ],
-
-        "#arrangedmarriage": [
-            "arranged marriage"
-        ],
-
-        "#marriageofconvenience": [
-            "marriage of convenience"
-        ],
-
-        "#fatedmates": [
-            "fated mates",
-            "soulmates",
-            "companheira destinada"
+            "fae",
+            "feérico"
         ]
+
     }
 
-    encontrados = []
 
-    for hashtag, frases in banco.items():
+    for hashtag, palavras in banco.items():
 
-        pontos = 0
+        pontos[hashtag] = 0
 
-        for frase in frases:
+        for palavra in palavras:
 
-            if frase in texto:
-                pontos += 1
+            pontos[hashtag] += texto.count(palavra)
 
-        if pontos >= 1:
-            encontrados.append(
-                (hashtag, pontos)
-            )
 
-        encontrados.sort(
-            key=lambda x: x[1],
-            reverse=True
-        )
+    resultado = sorted(
+        pontos,
+        key=pontos.get,
+        reverse=True
+    )
 
-    hashtags = [
-        tag[0]
-        for tag in encontrados[:3]
-    ]
 
-    # GARANTIA: sempre ter hashtag
+    hashtags = []
+
+    for tag in resultado:
+
+        if pontos[tag] > 0:
+
+            hashtags.append(tag)
+
+        if len(hashtags) == 3:
+            break
+
+
     if not hashtags:
-        hashtags = [
-            "#romance"
-        ]
+
+        hashtags.append("#romance")
+
 
     return hashtags
 
