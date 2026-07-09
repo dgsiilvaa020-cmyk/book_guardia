@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 
 from inteligencia_livro import (
     ler_inicio_epub,
-    gerar_hashtags
+    gerar_hashtags,
     analisar_livro
 )
 
