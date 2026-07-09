@@ -269,6 +269,44 @@ def extrair_dados_livro_epub(caminho):
 
         texto_inicio = ler_primeiras_paginas(caminho)
 
+
+        import re
+
+        serie = None
+        numero_serie = None
+
+        padroes = [
+            r"série\s+(.+?)\s+livro\s+(\d+)",
+            r"saga\s+(.+?)\s+livro\s+(\d+)",
+            r"series\s+(.+?)\s+book\s+(\d+)",
+            r"book\s+(\d+)\s+of\s+the\s+(.+)"
+       ]
+
+        for padrao in padroes:
+
+            resultado = re.search(
+                padrao,
+                texto_inicio,
+                flags=re.I
+       )
+
+            if resultado:
+
+                if len(resultado.groups()) == 2:
+
+                    if resultado.group(1).isdigit():
+
+                        numero_serie = resultado.group(1)
+                        serie = resultado.group(2)
+
+                    else:
+        
+                        serie = resultado.group(1)
+                        numero_serie = resultado.group(2)
+
+                break
+        
+
         print("========== INÍCIO ==========")
         print(texto_inicio[:1000])
         print("============================")
@@ -826,7 +864,7 @@ async def receber_arquivo(message: Message):
         pacote["numero_serie"] = dados["numero_serie"]
 
         chave_livro = remover_acentos(
-            nome_livro_epub.lower()
+            pacote.get("nome_livro", "").lower()
         )
 
         chave_livro = re.sub(
