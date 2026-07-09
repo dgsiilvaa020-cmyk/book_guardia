@@ -31,216 +31,147 @@ def ler_inicio_epub(caminho):
 
     return inicio
 
-def extrair_hashtags_explicitas(texto):
+def gerar_hashtags(texto):
+
     texto = texto.lower()
 
-    tags = []
+    banco = {
 
-    categorias = {
+        "#darkromance":[
+            "dark romance",
+            "dark",
+            "obsessão",
+            "obsession"
+        ],
 
-    "romance": [
-        "romance",
-        "amor",
-        "apaixon",
-        "love"
-    ],
+        "#mafia":[
+            "máfia",
+            "mafia",
+            "mafioso",
+            "bratva",
+            "camorra",
+            "cartel"
+        ],
 
-    "darkromance": [
-        "dark romance",
-        "dark",
-        "obsessão",
-        "obsession"
-    ],
+        "#harémreverso":[
+            "reverse harem",
+            "harém reverso",
+            "why choose"
+        ],
 
-    "fantasia": [
-        "fantasia",
-        "fantasy",
-        "magic",
-        "magia",
-        "dragão",
-        "dragon",
-        "reino"
-    ],
+        "#bdsm":[
+            "bdsm"
+        ],
 
-    "romantasia": [
-        "fae",
-        "fadas",
-        "elfo",
-        "elf",
-        "magia",
-        "reino mágico"
-    ],
+        "#romance":[
+            "romance",
+            "amor",
+            "love"
+        ],
 
-    "mafia": [
-        "máfia",
-        "mafia",
-        "mafioso",
-        "bratva",
-        "camorra",
-        "cosa nostra"
-    ],
+        "#fantasia":[
+            "fantasia",
+            "fantasy"
+        ],
 
-    "lobisomem": [
-        "lobisomem",
-        "werewolf",
-        "alpha",
-        "beta",
-        "mate",
-        "alcateia"
-    ],
+        "#romantasia":[
+            "romantasia"
+        ],
 
-    "vampiro": [
-        "vampiro",
-        "vampire",
-        "imortal",
-        "blood"
-    ],
+        "#vampiro":[
+            "vampiro",
+            "vampire"
+        ],
 
-    "bruxas": [
-        "bruxa",
-        "witch",
-        "feiticeira",
-        "coven"
-    ],
+        "#lobisomem":[
+            "lobisomem",
+            "werewolf"
+        ],
 
-    "realeza": [
-        "rei",
-        "rainha",
-        "princesa",
-        "príncipe",
-        "castle",
-        "coroa"
-    ],
+        "#bruxas":[
+            "bruxa",
+            "witch"
+        ],
 
-    "bilionario": [
-        "bilionário",
-        "billionaire",
-        "ceo",
-        "empresário"
-    ],
+        "#realeza":[
+            "rei",
+            "rainha",
+            "princesa",
+            "príncipe"
+        ],
 
-    "faculdade": [
-        "college",
-        "campus",
-        "universidade",
-        "faculdade",
-        "professor",
-        "dormitório"
-    ],
+        "#bilionario":[
+            "bilionário",
+            "billionaire",
+            "ceo"
+        ],
 
-    "harémreverso": [
-        "reverse harem",
-        "why choose"
-    ]
-}
+        "#faculdade":[
+            "college",
+            "campus",
+            "universidade",
+            "faculdade"
+        ],
 
-    TROPES = {
+        "#MMRomance":[
+            "mm romance",
+            "male/male"
+        ],
 
-    "enemiestolovers": [
-        "enemy",
-        "enemy to lovers",
-        "inimigos"
-    ],
+        "#FFRomance":[
+            "ff romance",
+            "female/female"
+        ],
 
-    "friendstolovers": [
-        "friends to lovers",
-        "melhores amigos"
-    ],
+        "#gravidezinesperada":[
+            "gravidez inesperada",
+            "unexpected pregnancy"
+        ],
 
-    "slowburn": [
-        "slow burn"
-    ],
+        "#bebê":[
+            "bebê",
+            "baby"
+        ],
 
-    "arrangedmarriage": [
-        "casamento arranjado",
-        "arranged marriage"
-    ],
+        "#enemiestolovers":[
+            "enemies to lovers"
+        ],
 
-    "marriageofconvenience": [
-        "casamento por contrato",
-        "marriage of convenience"
-    ],
+        "#friendstolovers":[
+            "friends to lovers"
+        ],
 
-    "fatedmates": [
-        "mate",
-        "destinados",
-        "alma gêmea"
-    ],
+        "#slowburn":[
+            "slow burn"
+        ],
 
-    "reverseharem": [
-        "reverse harem",
-        "why choose"
-    ]
-}
+        "#arrangedmarriage":[
+            "arranged marriage"
+        ],
 
-    TEMAS = {
+        "#marriageofconvenience":[
+            "marriage of convenience"
+        ],
 
-    "gravidezinesperada": [
-        "gravidez",
-        "pregnant",
-        "unexpected pregnancy"
-    ],
+        "#fatedmates":[
+            "fated mates",
+            "soulmates"
+        ]
+    }
 
-    "bebê": [
-        "bebê",
-        "baby"
-    ],
+    encontrados = []
 
-    "vingança": [
-        "vingança",
-        "revenge"
-    ],
-
-    "obsessão": [
-        "obsessão",
-        "obsession"
-    ],
-
-    "MMRomance":[
-        "mm romance",
-        "male/male",
-        "his boyfriend",
-        "boyfriend",
-        "he kissed him",
-        "two men"
-    ],
-
-    "FFRomance":[
-        "ff romance",
-        "female/female",
-        "girlfriend",
-        "she kissed her",
-        "two women"
-    ],
-
-    "magia": [
-        "magia",
-        "magic"
-    ],
-
-    "dragões": [
-        "dragão",
-        "dragon"
-    ],
-
-    "família": [
-        "family",
-        "família"
-    ]
-}
-
-    for categoria, palavras in categorias.items():
+    for hashtag, palavras in banco.items():
 
         for palavra in palavras:
 
             if palavra in texto:
-                tags.append("#" + categoria)
+
+                encontrados.append(hashtag)
+
                 break
 
-
-    return tags[:3]
-
-
+    return encontrados[:3]
 
 def descobrir_idioma(texto):
 
@@ -256,84 +187,7 @@ def descobrir_idioma(texto):
     except:
 
         return "PT"
-
-def criar_hashtags(texto, idioma):
-
-    texto = texto.lower()
-
-
-    if idioma == "PT":
-
-        banco = {
-
-            "#mafia": [
-                "máfia",
-                "mafioso",
-                "cartel"
-            ],
-
-            "#dark": [
-                "dark romance",
-                "vingança",
-                "obsessão"
-            ],
-
-            "#fantasia": [
-                "magia",
-                "dragão",
-                "reino",
-                "feitiço"
-            ],
-
-            "#romantasia": [
-                "magia",
-                "romance",
-                "princesa"
-            ],
-
-            "#realeza": [
-                "rei",
-                "rainha",
-                "principe",
-                "princesa"
-            ]
-
-        }
-
-
-    else:
-
-        banco = {
-
-            "#mafia": [
-                "mafia",
-                "gangster",
-                "cartel"
-            ],
-
-            "#darkromance": [
-                "dark romance",
-                "revenge",
-                "obsession"
-            ],
-
-            "#fantasy": [
-                "magic",
-                "dragon",
-                "kingdom"
-            ],
-
-            "#romantasy": [
-                "magic",
-                "romance",
-                "princess"
-            ]
-
-        }
-
-
-    resultado = []
-
+        
 
     for tag, palavras in banco.items():
 
@@ -349,14 +203,11 @@ def criar_hashtags(texto, idioma):
 
 def analisar_livro(caminho):
 
-    texto = ler_epub(caminho)
+    texto = ler_inicio_epub(caminho)
 
     idioma = descobrir_idioma(texto)
 
-    hashtags = criar_hashtags(
-        texto,
-        idioma
-    )
+    hashtags = gerar_hashtags(texto)
 
 
     return {
