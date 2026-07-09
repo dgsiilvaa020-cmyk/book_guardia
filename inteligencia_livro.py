@@ -185,35 +185,35 @@ def analisar_contexto(texto, memoria):
 
     }
 
-for paragrafo in paragrafos:
+    for paragrafo in paragrafos:
 
-    paragrafo = paragrafo.lower()
+        paragrafo = paragrafo.lower()
 
-    for genero, palavras in regras.items():
+        for genero, palavras in regras.items():
 
-        pontos = 0
+            pontos = 0
 
-        for palavra in palavras:
+            for palavra in palavras:
 
-            ocorrencias = paragrafo.count(palavra)
+                ocorrencias = paragrafo.count(palavra)
 
-            if ocorrencias > 0:
+                if ocorrencias > 0:
 
-                pontos += ocorrencias
+                    pontos += ocorrencias
 
-                if genero not in memoria["evidencias"]:
-                    memoria["evidencias"][genero] = []
+                    if genero not in memoria["evidencias"]:
+                        memoria["evidencias"][genero] = []
 
-                memoria["evidencias"][genero].append(
-                    f"{palavra} ({ocorrencias}x)"
+                    memoria["evidencias"][genero].append(
+                        f"{palavra} ({ocorrencias}x)"
+                    )
+
+                    memoria["frases_encontradas"].append(palavra)
+
+            if pontos > 0:
+                memoria["generos"][genero] = (
+                    memoria["generos"].get(genero, 0) + pontos
                 )
-
-                memoria["frases_encontradas"].append(palavra)
-
-        if pontos > 0:
-            memoria["generos"][genero] = (
-                memoria["generos"].get(genero, 0) + pontos
-            )
 
 def analisar_livro_com_memoria(caminho):
 
