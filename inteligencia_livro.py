@@ -44,7 +44,7 @@ def gerar_hashtags(texto):
             "homem possessivo",
             "homem perigoso",
             "ele nao consegue deixa la ir",
-            "obsessao por ela"
+            "obsessao por ela",
             "dark",
             "obsessão",
             "obsession"
@@ -56,7 +56,7 @@ def gerar_hashtags(texto):
             "mafioso",
             "bratva",
             "camorra",
-            "cartel"
+            "cartel",
             "família mafiosa",
             "império da máfia",
             "chefe da máfia",
@@ -89,7 +89,7 @@ def gerar_hashtags(texto):
 
         "#fantasia":[
             "fantasia",
-            "fantasy"
+            "fantasy",
             "mundo magico",
             "reino encantado",
             "criaturas sobrenaturais",
@@ -105,7 +105,7 @@ def gerar_hashtags(texto):
 
         "#vampiro":[
             "vampiro",
-            "vampire"
+            "vampire",
             "mordida no pescoco",
             "sede de sangue",
             "imortal da noite"
@@ -113,7 +113,7 @@ def gerar_hashtags(texto):
 
         "#lobisomem":[
             "lobisomem",
-            "werewolf"
+            "werewolf",
             "homem lobo",
             "transformacao em lobo",
             "lua cheia"
@@ -153,7 +153,7 @@ def gerar_hashtags(texto):
         ],
 
         "#gravidez":[
-            "gravidez" 
+            "gravidez", 
             "bebê",
             "baby"
         ],
@@ -180,7 +180,7 @@ def gerar_hashtags(texto):
 
         "#fatedmates":[
             "fated mates",
-            "soulmates"
+            "soulmates",
             "companheira destinada"
         ]
     }
@@ -226,22 +226,6 @@ def gerar_hashtags(texto):
 
     return hashtags
 
-    except:
-
-        return "PT"
-        
-
-    for tag, palavras in banco.items():
-
-        for palavra in palavras:
-
-            if palavra in texto:
-
-                resultado.append(tag)
-                break
-
-
-    return resultado[:3]
 
 def garantir_hashtag(lista):
 
