@@ -2,6 +2,16 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 from langdetect import detect
 
+def criar_memoria_temporaria():
+
+    return {
+
+        "generos": {},
+
+        "evidencias": {}
+
+    }
+
 def extrair_sinopse_epub(caminho):
 
     livro = epub.read_epub(caminho)
@@ -152,6 +162,151 @@ def ler_inicio_epub(caminho):
     inicio = texto_final[:15000]
 
     return inicio
+
+def ler_livro_completo(caminho):
+
+    livro = epub.read_epub(caminho)
+
+    capitulos = []
+
+
+    for item in livro.get_items():
+
+        if item.get_type() == 9:
+
+            soup = BeautifulSoup(
+                item.get_content(),
+                "html.parser"
+            )
+
+
+            texto = soup.get_text(
+                " ",
+                strip=True
+            )
+
+
+            if texto:
+
+                capitulos.append(texto)
+
+
+    return capitulos
+
+def analisar_contexto(texto, memoria):
+
+    texto = texto.lower()
+
+
+    regras = {
+
+
+        "#harémreverso":[
+
+            "reverse harem",
+            "harém reverso",
+            "why choose",
+            "vários homens",
+            "mais de um companheiro"
+
+        ],
+
+
+        "#darkromance":[
+
+            "dark romance",
+            "homem possessivo",
+            "relacionamento obsessivo",
+            "amor sombrio"
+
+        ],
+
+
+        "#fantasia":[
+
+            "mundo mágico",
+            "reino mágico",
+            "criaturas sobrenaturais",
+            "poderes mágicos",
+            "feitiços"
+
+        ],
+
+
+        "#lobisomem":[
+
+            "se transformou em lobo",
+            "forma de lobo",
+            "lua cheia",
+            "matilha de lobos"
+
+        ],
+
+
+        "#mafia":[
+
+            "chefe da máfia",
+            "organização criminosa",
+            "família mafiosa",
+            "submundo criminoso"
+
+        ]
+
+    }
+
+
+
+    for genero, frases in regras.items():
+
+
+        for frase in frases:
+
+
+            if frase in texto:
+
+
+                memoria["generos"][genero] = (
+                    memoria["generos"].get(genero, 0) + 1
+                )
+
+
+                if genero not in memoria["evidencias"]:
+
+                    memoria["evidencias"][genero] = []
+
+
+                memoria["evidencias"][genero].append(frase)
+
+def analisar_livro_com_memoria(caminho):
+
+    memoria = criar_memoria_temporaria()
+
+
+    capitulos = ler_livro_completo(caminho)
+
+
+    for capitulo in capitulos:
+
+        analisar_contexto(
+            capitulo,
+            memoria
+        )
+
+
+    hashtags = sorted(
+        memoria["generos"],
+        key=memoria["generos"].get,
+        reverse=True
+    )
+
+
+    resultado = hashtags[:3]
+
+
+    memoria.clear()
+
+
+    return resultado
 
 def gerar_hashtags(texto):
 
@@ -374,7 +529,13 @@ def analisar_livro(caminho):
 
     idioma = descobrir_idioma(texto)
 
-    hashtags = procurar_tags_existentes(texto)
+
+    hashtags = analisar_livro_com_memoria(caminho)
+
+
+    if not hashtags:
+
+        hashtags = procurar_tags_existentes(texto)
 
 
     if not hashtags:
@@ -383,6 +544,12 @@ def analisar_livro(caminho):
 
 
     hashtags = garantir_hashtag(hashtags)
+
+
+    return {
+        "idioma": idioma,
+        "hashtags": hashtags
+    }
 
     hashtags = garantir_hashtag(hashtags)
 
