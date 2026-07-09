@@ -238,6 +238,19 @@ def extrair_dados_livro_epub(caminho):
         titulos = livro.get_metadata("DC", "title")
         autores = livro.get_metadata("DC", "creator")
 
+        serie = None
+        numero_serie = None
+
+        # Metadados do Calibre
+        series = livro.get_metadata("OPF", "calibre:series")
+        series_index = livro.get_metadata("OPF", "calibre:series_index")
+
+        if series:
+            serie = series[0][0]
+
+        if series_index:
+            numero_serie = str(series_index[0][0])
+
         if titulos:
             titulo = titulos[0][0]
 
@@ -266,7 +279,9 @@ def extrair_dados_livro_epub(caminho):
 
         return {
             "nome_livro": titulo or "Livro não identificado",
-            "autor": autor or "Autor não identificado"
+            "autor": autor or "Autor não identificado",
+            "serie": serie,
+            "numero_serie": numero_serie
         }
 
 
@@ -763,6 +778,8 @@ async def receber_arquivo(message: Message):
 
         pacote["nome_livro"] = dados["nome_livro"]
         pacote["autor"] = dados["autor"]
+        pacote["serie"] = dados["serie"]
+        pacote["numero_serie"] = dados["numero_serie"]
 
         chave_livro = remover_acentos(
             nome_livro_epub.lower()
