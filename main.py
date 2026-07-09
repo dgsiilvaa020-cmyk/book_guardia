@@ -808,6 +808,7 @@ async def receber_figurinha(message: Message):
             "autor",
             "Autor não informado"
         )
+    )
 
     for indice, pacote in enumerate(pacotes_pendentes[admin_id]):
 
