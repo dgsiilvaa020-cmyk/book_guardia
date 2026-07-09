@@ -225,6 +225,58 @@ def extrair_metadados_epub(caminho):
         print("Erro lendo metadados EPUB:", e)
         return "Livro não informado", "Autor não informado"
 
+def extrair_dados_livro_epub(caminho):
+
+    try:
+        livro = epub.read_epub(caminho)
+
+        titulo = None
+        autor = None
+
+        # tenta metadados internos
+        titulos = livro.get_metadata("DC", "title")
+        autores = livro.get_metadata("DC", "creator")
+
+        if titulos:
+            titulo = titulos[0][0]
+
+        if autores:
+            autor = autores[0][0]
+
+
+        # se vier nome da logo ou tradução, limpa
+        if titulo:
+            palavras_bloqueadas = [
+                "traduzido",
+                "tradução",
+                "j coruja",
+                "almascriptum",
+                "lumos",
+                "translate"
+            ]
+
+            titulo_limpo = titulo.lower()
+
+            for palavra in palavras_bloqueadas:
+                titulo_limpo = titulo_limpo.replace(palavra, "")
+
+            titulo = titulo_limpo.strip()
+
+
+        return {
+            "nome_livro": titulo or "Livro não identificado",
+            "autor": autor or "Autor não identificado"
+        }
+
+
+    except Exception as e:
+        print("Erro EPUB:", e)
+
+        return {
+            "nome_livro": "Livro não identificado",
+            "autor": "Autor não identificado"
+        }
+
 def criar_chave_livro(texto):
     nome = extrair_nome_livro(texto)
     nome = remover_acentos(nome.lower())
@@ -706,10 +758,11 @@ async def receber_arquivo(message: Message):
 
         texto = ler_inicio_epub(caminho)
 
-        nome_livro_epub, autor_epub = extrair_metadados_epub(caminho)
+        dados = extrair_dados_livro_epub(caminho)
 
-        pacote["nome_livro"] = nome_livro_epub
-        pacote["autor"] = autor_epub
+        pacote["nome_livro"] = dados["nome_livro"]
+        pacote["autor"] = dados["autor"]
+        pacote["título"] = dados["título"]
 
         chave_livro = remover_acentos(
             nome_livro_epub.lower()
@@ -812,6 +865,22 @@ async def receber_figurinha(message: Message):
 
     for indice, pacote in enumerate(pacotes_pendentes[admin_id]):
 
+        legenda = formatar_mensagem_config(
+            "msg_arquivo",
+            nome=nome,
+            id_pedido=id_pedido,
+            numero_missao=numero,
+            nome_livro=pacote.get(
+                "nome_livro",
+                "Livro não informado"
+            ),
+            autor=pacote.get(
+                "autor",
+                "Autor não informado"
+            )
+        )
+
+        caption = legenda
         # Apenas a primeira capa recebe a legenda completa
         caption = legenda
             
