@@ -78,7 +78,8 @@ def ler_livro_completo(caminho):
 def analisar_contexto(texto, memoria):
 
     texto = texto.lower()
-
+    
+    paragrafos = texto.split("\n")
 
     regras = {
 
@@ -136,29 +137,25 @@ def analisar_contexto(texto, memoria):
 
     }
 
+    for paragrafo in paragrafos:
 
+    paragrafo = paragrafo.lower()
 
     for genero, frases in regras.items():
 
-
         for frase in frases:
 
-
-            if frase in texto:
-
+            if frase in paragrafo:
 
                 memoria["generos"][genero] = (
-                    memoria["generos"].get(genero, 0) + 1
+                    memoria["generos"].get(genero, 0) + 5
                 )
 
-
                 if genero not in memoria["evidencias"]:
-
                     memoria["evidencias"][genero] = []
 
+                memoria["evidencias"][genero].append(paragrafo[:300])
 
-                memoria["evidencias"][genero].append(frase)
-                
                 memoria["frases_encontradas"].append(frase)
 
 def analisar_livro_com_memoria(caminho):
