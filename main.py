@@ -375,7 +375,7 @@ def extrair_dados_livro_epub(caminho):
 
         return {
             "nome_livro": "Livro não identificado",
-            "autor": "Autor não identificado"
+            "autor": "Autor não identificado",
             "serie": None,
             "numero_serie": None
         }
