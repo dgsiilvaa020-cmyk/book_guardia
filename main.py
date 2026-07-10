@@ -25,6 +25,7 @@ from bs4 import BeautifulSoup
 
 def ler_primeiras_paginas(caminho, limite=5):
     livro = epub.read_epub(caminho)
+    inicio = ler_primeiras_paginas(caminho)
 
     paginas = []
 
@@ -376,6 +377,8 @@ def extrair_dados_livro_epub(caminho):
         return {
             "nome_livro": "Livro não identificado",
             "autor": "Autor não identificado"
+            "serie": None,
+            "numero_serie": None
         }
 
 def criar_chave_livro(texto):
