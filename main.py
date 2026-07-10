@@ -275,35 +275,39 @@ def extrair_dados_livro_epub(caminho):
 
         import re
 
+        import re
+
         serie = None
-        numero = None
+        numero_serie = None
 
         padroes = [
-
-            r"Série\s+(.+?)\s+livro\s+(\d+)",
-            r"Serie\s+(.+?)\s+livro\s+(\d+)",
-
-            r"Saga\s+(.+?)\s+livro\s+(\d+)",
-
-            r"Trilogia\s+(.+?)\s+livro\s+(\d+)",
-
-            r"Duologia\s+(.+?)\s+livro\s+(\d+)",
-
-            r"Collection\s+(.+?)\s+Book\s+(\d+)"
+            r"série\s+(.+?)\s+livro\s+(\d+)",
+            r"saga\s+(.+?)\s+livro\s+(\d+)",
+            r"series\s+(.+?)\s+book\s+(\d+)",
+            r"book\s+(\d+)\s+of\s+the\s+(.+)"
         ]
 
         for padrao in padroes:
 
             resultado = re.search(
                 padrao,
-                inicio,
-                re.IGNORECASE
+                texto_inicio,
+                flags=re.I
             )
 
             if resultado:
 
-                serie = resultado.group(1).strip()
-                numero = resultado.group(2).strip()
+                if len(resultado.groups()) == 2:
+
+                    if resultado.group(1).isdigit():
+
+                        numero_serie = resultado.group(1)
+                        serie = resultado.group(2)
+
+                    else:
+
+                        serie = resultado.group(1)
+                        numero_serie = resultado.group(2)
 
                 break
         
@@ -359,15 +363,10 @@ def extrair_dados_livro_epub(caminho):
 
 
         return {
-
             "nome_livro": titulo or "Livro não identificado",
-
             "autor": autor or "Autor não identificado",
-
             "serie": serie,
-
-            "numero_serie": numero
-
+            "numero_serie": numero_serie
         }
 
 
@@ -978,7 +977,7 @@ async def receber_figurinha(message: Message):
             ""
         )
     )
-
+    
     for indice, pacote in enumerate(pacotes_pendentes[admin_id]):
 
         legenda = formatar_mensagem_config(
@@ -986,22 +985,22 @@ async def receber_figurinha(message: Message):
             nome=nome,
             id_pedido=id_pedido,
             numero_missao=numero,
-            nome_livro=pacote.get(
+            nome_livro=pacotes_pendentes[admin_id][0].get(
                 "nome_livro",
                 "Livro não informado"
             ),
-            autor=pacote.get(
+            autor=pacotes_pendentes[admin_id][0].get(
                 "autor",
                 "Autor não informado"
             ),
-            serie=pacote.get(
+            serie=pacotes_pendentes[admin_id][0].get(
                 "serie",
                 ""
             ),
-            numero_serie=pacote.get(
+            numero_serie=pacotes_pendentes[admin_id][0].get(
                 "numero_serie",
                 ""
-            )
+            )        
         )
 
         caption = legenda
