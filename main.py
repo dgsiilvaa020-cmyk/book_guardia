@@ -25,7 +25,6 @@ from bs4 import BeautifulSoup
 
 def ler_primeiras_paginas(caminho, limite=5):
     livro = epub.read_epub(caminho)
-    inicio = ler_primeiras_paginas(caminho)
 
     paginas = []
 
