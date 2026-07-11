@@ -31,44 +31,53 @@ def ler_capitulos_epub(caminho, limite=5):
 
     numero = 0
 
-    for item in livro.get_items():
+    # pega a ordem real do EPUB
+    for item_id, _ in livro.spine:
 
-        if item.get_type() == 9:
+        item = livro.get_item_with_id(item_id)
 
-            soup = BeautifulSoup(
-                item.get_content(),
-                "html.parser"
+        if not item:
+            continue
+
+        if item.get_type() != 9:
+            continue
+
+
+        soup = BeautifulSoup(
+            item.get_content(),
+            "html.parser"
+        )
+
+        texto = ""
+
+        for tag in soup.find_all(
+            ["h1", "h2", "h3", "p"]
+        ):
+
+            conteudo = tag.get_text(
+                " ",
+                strip=True
             )
 
-            texto = ""
-
-            for tag in soup.find_all(
-                ["h1", "h2", "h3", "p"]
-            ):
-
-                conteudo = tag.get_text(
-                    " ",
-                    strip=True
-                )
-
-                if conteudo:
-                    texto += conteudo + "\n\n"
+            if conteudo:
+                texto += conteudo + "\n\n"
 
 
-            if texto.strip():
+        if texto.strip():
 
-                numero += 1
+            numero += 1
 
-                capitulos.append(
-                    f"📖 CAPÍTULO {numero}\n\n{texto}"
-                )
+            capitulos.append(
+                f"📖 CAPÍTULO {numero}\n\n{texto.strip()}"
+            )
 
 
-            if numero >= limite:
-                break
+        if numero >= limite:
+            break
 
 
     return "\n\n━━━━━━━━━━━━━━\n\n".join(capitulos)
+    
     
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -295,8 +304,7 @@ def extrair_dados_livro_epub(caminho):
 
         print("EPUB aberto!")
 
-        texto_inicio = ler_primeiras_paginas(caminho)
-
+        texto_inicio = ler_capitulos_epub(caminho, limite=5)
 
         import re
 
@@ -999,8 +1007,6 @@ async def escolher_traducao(callback: CallbackQuery):
         "🏁 finalize com a figurinha."
     )
 
-    await callback.message.edit_text(texto)
-
 
 @dp.message(F.chat.type == "private", F.document)
 async def receber_arquivo(message: Message):
@@ -1117,6 +1123,7 @@ async def receber_arquivo(message: Message):
         parse_mode="HTML",
         reply_markup=menu_confirmar_livro()
     )
+    
 
 @dp.callback_query(F.data == "ver_inicio_livro")
 async def ver_inicio_livro(callback: CallbackQuery):
@@ -1130,28 +1137,30 @@ async def ver_inicio_livro(callback: CallbackQuery):
         )
         return
 
-
     caminho = livros_analise[admin]
-
 
     texto = ler_capitulos_epub(
         caminho,
         limite=15
     )
 
-
     if not texto:
         texto = "Não consegui extrair o começo do livro."
 
-
     await callback.answer()
 
+    # Divide em mensagens menores para o Telegram
+    partes = [
+        texto[i:i+4000]
+        for i in range(0, len(texto), 4000)
+    ]
 
-    await callback.message.answer(
-        "📖 <b>Primeiras páginas do livro:</b>\n\n"
-        + texto[:4000],
-        parse_mode="HTML"
-    )
+    for parte in partes:
+
+        await callback.message.answer(
+            "📖 <b>Primeiras páginas do livro:</b>\n\n" + parte,
+            parse_mode="HTML"
+        )
     
 
 @dp.message(F.chat.type == "private", F.sticker)
