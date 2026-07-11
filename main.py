@@ -117,6 +117,8 @@ pedido_selecionado = {}
 # Cada administrador terá vários pacotes
 pacotes_pendentes = {}
 
+livros_analise = {}
+
 modo_edicao = {}
 
 def autorizado(user_id: int):
@@ -517,27 +519,9 @@ def menu_confirmar_livro():
     kb = InlineKeyboardBuilder()
 
     kb.button(
-        text="🏷️ Escolher Hashtags",
-        callback_data="escolher_hashtags"
+        text="📖 Ver primeiras páginas",
+        callback_data="ver_inicio_livro"
     )
-
-    kb.button(
-        text="✏️ Editar Sinopse",
-        callback_data="editar_sinopse"
-    )
-
-    kb.button(
-        text="✅ Confirmar Livro",
-        callback_data="confirmar_livro"
-    )
-
-    kb.adjust(1)
-
-    return kb.as_markup()
-
-def menu_confirmar_livro():
-
-    kb = InlineKeyboardBuilder()
 
     kb.button(
         text="🏷️ Escolher Hashtags",
@@ -545,7 +529,7 @@ def menu_confirmar_livro():
     )
 
     kb.button(
-        text="✏️ Editar Sinopse",
+        text="✏️ Inserir Sinopse",
         callback_data="editar_sinopse"
     )
 
@@ -1018,6 +1002,8 @@ async def receber_arquivo(message: Message):
 
         resultado = analisar_livro(caminho)
 
+        livros_analise[admin] = caminho
+
         pacote["sinopse"] = resultado["sinopse"]
         pacote["origem_sinopse"] = resultado["origem"]
 
@@ -1065,6 +1051,41 @@ async def receber_arquivo(message: Message):
         texto,
         parse_mode="HTML",
         reply_markup=menu_confirmar_livro()
+    )
+
+@dp.callback_query(F.data == "ver_inicio_livro")
+async def ver_inicio_livro(callback: CallbackQuery):
+
+    admin = callback.from_user.id
+
+    if admin not in livros_analise:
+        await callback.answer(
+            "Nenhum EPUB encontrado.",
+            show_alert=True
+        )
+        return
+
+
+    caminho = livros_analise[admin]
+
+
+    texto = ler_primeiras_paginas(
+        caminho,
+        limite=15
+    )
+
+
+    if not texto:
+        texto = "Não consegui extrair o começo do livro."
+
+
+    await callback.answer()
+
+
+    await callback.message.answer(
+        "📖 <b>Primeiras páginas do livro:</b>\n\n"
+        + texto[:4000],
+        parse_mode="HTML"
     )
     
 
