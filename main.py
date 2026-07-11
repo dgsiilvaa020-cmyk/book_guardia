@@ -1772,7 +1772,7 @@ async def receber_figurinha(message: Message):
         sinopse_completa = None
 
         # Telegram aceita no máximo 1024 caracteres na legenda
-        if len(caption) > 1000:
+        if len(caption) > 1500:
 
             sinopse = pacote.get("sinopse", "")
 
