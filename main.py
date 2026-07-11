@@ -512,6 +512,52 @@ def menu_configuracoes():
 
     return kb.as_markup()
 
+def menu_confirmar_livro():
+
+    kb = InlineKeyboardBuilder()
+
+    kb.button(
+        text="🏷️ Escolher Hashtags",
+        callback_data="escolher_hashtags"
+    )
+
+    kb.button(
+        text="✏️ Editar Sinopse",
+        callback_data="editar_sinopse"
+    )
+
+    kb.button(
+        text="✅ Confirmar Livro",
+        callback_data="confirmar_livro"
+    )
+
+    kb.adjust(1)
+
+    return kb.as_markup()
+
+def menu_confirmar_livro():
+
+    kb = InlineKeyboardBuilder()
+
+    kb.button(
+        text="🏷️ Escolher Hashtags",
+        callback_data="escolher_hashtags"
+    )
+
+    kb.button(
+        text="✏️ Editar Sinopse",
+        callback_data="editar_sinopse"
+    )
+
+    kb.button(
+        text="✅ Confirmar Livro",
+        callback_data="confirmar_livro"
+    )
+
+    kb.adjust(1)
+
+    return kb.as_markup()
+
 
 def menu_pedidos(pedidos):
     kb = InlineKeyboardBuilder()
@@ -840,6 +886,7 @@ async def receber_capa(message: Message):
         "hashtags": [],
         "sinopse": "",
         "origem_sinopse": ""
+        "confirmado": False,
     }
 
     pacotes_pendentes[admin].append(pacote)
@@ -981,11 +1028,43 @@ async def receber_arquivo(message: Message):
     total = len(pacote["arquivos"])
 
 
+    origens = {
+        "metadados": "📚 Metadados do EPUB",
+        "inicio": "📖 Sinopse encontrada no livro",
+        "resumo": "🤖 Resumo criado automaticamente"
+    }
+
+    origem = origens.get(
+        pacote["origem_sinopse"],
+        pacote["origem_sinopse"]
+    )
+
+    texto = (
+        "📚 <b>Livro analisado!</b>\n\n"
+
+        f"<b>📖 Título:</b>\n{pacote.get('nome_livro','-')}\n\n"
+
+        f"<b>✍️ Autor:</b>\n{pacote.get('autor','-')}\n\n"
+
+        f"<b>📚 Série:</b>\n{pacote.get('serie') or '—'}\n\n"
+
+       f"<b>📌 Origem da sinopse:</b>\n{origem}\n\n"
+
+        "━━━━━━━━━━━━━━\n"
+
+        "<b>📖 SINOPSE</b>\n\n"
+
+        f"{pacote['sinopse']}\n\n"
+
+        "━━━━━━━━━━━━━━\n\n"
+
+        "Agora escolha as hashtags ou confirme o livro."
+    )
+
     await message.answer(
-        f"✅ Arquivo recebido.\n\n"
-        f"Arquivos deste livro: {total}\n\n"
-        "Pode enviar mais arquivos deste mesmo livro.\n"
-        "Quando terminar este livro, envie outra capa ou finalize com a figurinha."
+        texto,
+        parse_mode="HTML",
+        reply_markup=menu_confirmar_livro()
     )
     
 
