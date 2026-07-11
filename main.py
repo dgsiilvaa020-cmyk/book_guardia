@@ -160,6 +160,10 @@ configs_padrao = {
     "msg_nao_encontrei": "🔍 Guardião, essa missão ainda não foi encontrada no acervo.\nEla ficará guardada nas Missões Não Encontradas.",
 
     "msg_ja_postado": "📚 Guardião, essa missão já foi concluída anteriormente.\nDá uma olhada no nosso acervo."
+
+     # NOVAS CONFIGURAÇÕES
+    "usar_sinopse": "1",
+    "usar_hashtags": "1"
 }
 
 for chave, valor in configs_padrao.items():
@@ -442,13 +446,22 @@ def contadores_texto():
 
 def menu_pv():
     kb = InlineKeyboardBuilder()
+
     kb.button(text="🎯 Missões registradas", callback_data="missoes")
     kb.button(text="🔍 Missões Não Encontradas", callback_data="missoes_nao_encontradas")
     kb.button(text="📊 Contadores", callback_data="contadores")
     kb.button(text="✏️ Personalizar Mensagens", callback_data="personalizar")
     kb.button(text="🧠 Arquivo Inteligente", callback_data="arquivo_inteligente")
+
+    kb.button(
+        text="⚙️ Configurações",
+        callback_data="configuracoes"
+    )
+
     kb.button(text="🧹 Limpar missões concluídas", callback_data="limpar")
+
     kb.adjust(1)
+
     return kb.as_markup()
 
 
@@ -470,6 +483,33 @@ def menu_arquivo_inteligente():
     kb.button(text="📊 Ver contadores", callback_data="contadores")
     kb.button(text="⬅️ Voltar", callback_data="voltar_menu")
     kb.adjust(1)
+    return kb.as_markup()
+
+
+def menu_configuracoes():
+
+    sinopse = pegar_config("usar_sinopse")
+    hashtags = pegar_config("usar_hashtags")
+
+    kb = InlineKeyboardBuilder()
+
+    kb.button(
+        text=f"{'✅' if sinopse=='1' else '❌'} Sinopse",
+        callback_data="toggle_sinopse"
+    )
+
+    kb.button(
+        text=f"{'✅' if hashtags=='1' else '❌'} Hashtags",
+        callback_data="toggle_hashtags"
+    )
+
+    kb.button(
+        text="⬅️ Voltar",
+        callback_data="voltar_menu"
+    )
+
+    kb.adjust(1)
+
     return kb.as_markup()
 
 
@@ -524,6 +564,52 @@ async def menu(message: Message):
     await message.answer(
         "📚 Menu principal:",
         reply_markup=menu_pv()
+    )
+
+@dp.callback_query(F.data == "configuracoes")
+async def configuracoes(callback: CallbackQuery):
+
+    if not autorizado(callback.from_user.id):
+        return
+
+    await callback.answer()
+
+    await callback.message.answer(
+        "⚙️ Configurações",
+        reply_markup=menu_configuracoes()
+    )
+
+
+@dp.callback_query(F.data == "toggle_sinopse")
+async def toggle_sinopse(callback: CallbackQuery):
+
+    valor = pegar_config("usar_sinopse")
+
+    if valor == "1":
+        salvar_config("usar_sinopse", "0")
+    else:
+        salvar_config("usar_sinopse", "1")
+
+    await callback.answer()
+
+    await callback.message.edit_reply_markup(
+        reply_markup=menu_configuracoes()
+    )
+
+@dp.callback_query(F.data == "toggle_hashtags")
+async def toggle_hashtags(callback: CallbackQuery):
+
+    valor = pegar_config("usar_hashtags")
+
+    if valor == "1":
+        salvar_config("usar_hashtags", "0")
+    else:
+        salvar_config("usar_hashtags", "1")
+
+    await callback.answer()
+
+    await callback.message.edit_reply_markup(
+        reply_markup=menu_configuracoes()
     )
 
 
