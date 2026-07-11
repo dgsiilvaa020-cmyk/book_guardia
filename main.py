@@ -689,26 +689,30 @@ async def receber_texto_personalizado(message: Message):
 
     if chave == "sinopse_manual":
 
-    pacote = pacotes_pendentes[message.from_user.id][-1]
+        pacote = pacotes_pendentes[message.from_user.id][-1]
 
-    pacote["sinopse"] = message.text
-    pacote["origem_sinopse"] = "manual"
+        pacote["sinopse"] = message.text
+        pacote["origem_sinopse"] = "manual"
+
+        modo_edicao.pop(
+            message.from_user.id,
+            None
+        )
+
+        await message.answer(
+            "✅ Sinopse personalizada salva!",
+            reply_markup=menu_confirmar_livro()
+        )
+
+        return
+
+
+    salvar_config(chave, message.text)
 
     modo_edicao.pop(
         message.from_user.id,
         None
     )
-
-    await message.answer(
-        "✅ Sinopse personalizada salva!",
-        reply_markup=menu_confirmar_livro()
-    )
-
-    return
-    
-
-    salvar_config(chave, message.text)
-    modo_edicao.pop(message.from_user.id, None)
 
     nova = pegar_config(chave)
 
@@ -718,6 +722,7 @@ async def receber_texto_personalizado(message: Message):
         f"{nova}",
         reply_markup=menu_pv()
     )
+    
 
 @dp.message(F.chat.id == GRUPO_PEDIDOS, F.text)
 async def registrar_pedido(message: Message):
@@ -1092,8 +1097,8 @@ async def receber_arquivo(message: Message):
     }
 
     origem = origens.get(
-        pacote["origem_sinopse"],
-        pacote["origem_sinopse"]
+        pacote.get("origem_sinopse", ""),
+        pacote.get("origem_sinopse", "Não encontrada")
     )
 
     texto = (
