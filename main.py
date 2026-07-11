@@ -139,22 +139,21 @@ def menu_capitulos(capitulos):
 
     kb = InlineKeyboardBuilder()
 
-
     for capitulo in capitulos:
 
-        resumo = capitulo["texto"][:40]
+        inicio = capitulo["texto"][:35]
+
+        inicio = inicio.replace("\n", " ")
 
         kb.button(
-            text=f"📖 Cap {capitulo['numero']}\n{resumo}...",
+            text=f"📖 Cap {capitulo['numero']}\n{inicio}...",
             callback_data=f"abrir_capitulo_{capitulo['numero']}"
         )
 
-
     kb.button(
-        text="⬅️ Voltar",
+        text="❌ Fechar",
         callback_data="fechar_capitulos"
     )
-
 
     kb.adjust(4)
 
@@ -687,6 +686,8 @@ def voltar_capitulo():
         callback_data="voltar_lista_capitulos"
     )
 
+    kb.adjust(1)
+
     return kb.as_markup()
 
 
@@ -777,11 +778,27 @@ async def toggle_sinopse(callback: CallbackQuery):
 @dp.callback_query(F.data == "voltar_lista_capitulos")
 async def voltar_lista_capitulos(callback: CallbackQuery):
 
+    admin = callback.from_user.id
+
+    capitulos = livros_capitulos.get(admin)
+
+
+    if not capitulos:
+
+        await callback.answer(
+            "Lista expirada.",
+            show_alert=True
+        )
+
+        return
+
+
     await callback.answer()
+
 
     await callback.message.edit_text(
         "📖 Escolha um capítulo:",
-        reply_markup=menu_capitulos()
+        reply_markup=menu_capitulos(capitulos)
     )
 
 
@@ -1181,6 +1198,11 @@ async def receber_arquivo(message: Message):
             caminho
         )
 
+        livros_capitulos[admin] = extrair_lista_capitulos_epub(
+            caminho,
+            limite=15
+        )
+
 
         texto = ler_inicio_epub(caminho)
 
@@ -1271,15 +1293,16 @@ async def abrir_capitulo(callback: CallbackQuery):
         )
     )
 
-
     capitulos = livros_capitulos.get(admin)
 
 
     if not capitulos:
+
         await callback.answer(
             "Prévia expirada.",
             show_alert=True
         )
+
         return
 
 
@@ -1293,13 +1316,12 @@ async def abrir_capitulo(callback: CallbackQuery):
 
 
     await callback.message.edit_text(
-        "📖 Escolha um capítulo para visualizar:",
-        reply_markup=menu_capitulos(capitulos)
+        texto[:4000],
+        reply_markup=voltar_capitulo()
     )
 
 
-    for parte in partes[1:]:
-        await callback.message.answer(parte)
+    await callback.answer()
     
 
 @dp.message(F.chat.type == "private", F.sticker)
