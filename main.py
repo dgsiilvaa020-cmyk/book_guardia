@@ -629,8 +629,8 @@ def menu_confirmar_livro():
     kb = InlineKeyboardBuilder()
 
     kb.button(
-        text="📖 Ver primeiras páginas",
-        callback_data="ver_inicio_livro"
+        text="📖 Ver capítulos",
+        callback_data="ver_capitulos"
     )
 
     kb.button(
@@ -706,6 +706,28 @@ async def start(message: Message):
         reply_markup=menu_pv()
     )
 
+@dp.callback_query(F.data == "ver_capitulos")
+async def ver_capitulos(callback: CallbackQuery):
+
+    admin = callback.from_user.id
+
+    capitulos = livros_capitulos.get(admin)
+
+    if not capitulos:
+        await callback.answer(
+            "Capítulos não encontrados.",
+            show_alert=True
+        )
+        return
+
+
+    await callback.answer()
+
+
+    await callback.message.edit_text(
+        "📖 Escolha o capítulo:",
+        reply_markup=menu_capitulos(capitulos)
+    )
 
 @dp.message(Command("menu"))
 async def menu(message: Message):
@@ -758,14 +780,8 @@ async def voltar_lista_capitulos(callback: CallbackQuery):
 
     capitulos = livros_capitulos.get(admin)
 
-
     if not capitulos:
-
-        await callback.answer(
-            "Lista expirada.",
-            show_alert=True
-        )
-
+        await callback.answer()
         return
 
 
@@ -776,7 +792,6 @@ async def voltar_lista_capitulos(callback: CallbackQuery):
         "📖 Escolha um capítulo:",
         reply_markup=menu_capitulos(capitulos)
     )
-
 
 @dp.callback_query(F.data == "toggle_hashtags")
 async def toggle_hashtags(callback: CallbackQuery):
@@ -1205,6 +1220,11 @@ async def receber_arquivo(message: Message):
 
         resultado = analisar_livro(caminho)
 
+        livros_capitulos[admin] = extrair_lista_capitulos_epub(
+            caminho,
+            limite=15
+        )
+
         livros_analise[admin] = caminho
 
         pacote["sinopse"] = resultado["sinopse"]
@@ -1260,24 +1280,7 @@ async def receber_arquivo(message: Message):
 @dp.callback_query(F.data.startswith("abrir_capitulo_"))
 async def abrir_capitulo(callback: CallbackQuery):
 
-    print("ENTROU ABRIR CAPITULO")
-
     admin = callback.from_user.id
-
-    print("ADMIN:", admin)
-
-    capitulos = livros_capitulos.get(admin)
-
-    print("CAPITULOS:", capitulos)
-
-
-    if not capitulos:
-        await callback.answer(
-            "Capítulos não carregados.",
-            show_alert=True
-        )
-        return
-
 
     numero = int(
         callback.data.replace(
@@ -1287,17 +1290,30 @@ async def abrir_capitulo(callback: CallbackQuery):
     )
 
 
-    capitulo = capitulos[numero - 1]
+    capitulos = livros_capitulos.get(admin)
 
 
-    await callback.message.edit_text(
+    if not capitulos:
+        await callback.answer(
+            "Prévia expirada.",
+            show_alert=True
+        )
+        return
+
+
+    capitulo = capitulos[numero-1]
+
+
+    texto = (
         f"📖 CAPÍTULO {numero}\n\n"
-        f"{capitulo['texto'][:4000]}",
-        reply_markup=voltar_capitulo()
+        f"{capitulo['texto']}"
     )
 
 
-    await callback.answer()
+    await callback.message.edit_text(
+        texto,
+        reply_markup=voltar_capitulo()
+    )
     
 
 @dp.message(F.chat.type == "private", F.sticker)
