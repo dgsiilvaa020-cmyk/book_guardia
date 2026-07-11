@@ -134,30 +134,6 @@ def extrair_lista_capitulos_epub(caminho, limite=15):
 
 
     return capitulos
-
-def menu_capitulos(capitulos):
-
-    kb = InlineKeyboardBuilder()
-
-    for capitulo in capitulos:
-
-        inicio = capitulo["texto"][:35]
-
-        inicio = inicio.replace("\n", " ")
-
-        kb.button(
-            text=f"📖 Cap {capitulo['numero']}\n{inicio}...",
-            callback_data=f"abrir_capitulo_{capitulo['numero']}"
-        )
-
-    kb.button(
-        text="❌ Fechar",
-        callback_data="fechar_capitulos"
-    )
-
-    kb.adjust(4)
-
-    return kb.as_markup()
     
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMINS = [8672397104]  # coloque seu ID aqui
@@ -1284,7 +1260,24 @@ async def receber_arquivo(message: Message):
 @dp.callback_query(F.data.startswith("abrir_capitulo_"))
 async def abrir_capitulo(callback: CallbackQuery):
 
+    print("ENTROU ABRIR CAPITULO")
+
     admin = callback.from_user.id
+
+    print("ADMIN:", admin)
+
+    capitulos = livros_capitulos.get(admin)
+
+    print("CAPITULOS:", capitulos)
+
+
+    if not capitulos:
+        await callback.answer(
+            "Capítulos não carregados.",
+            show_alert=True
+        )
+        return
+
 
     numero = int(
         callback.data.replace(
@@ -1293,30 +1286,13 @@ async def abrir_capitulo(callback: CallbackQuery):
         )
     )
 
-    capitulos = livros_capitulos.get(admin)
 
-
-    if not capitulos:
-
-        await callback.answer(
-            "Prévia expirada.",
-            show_alert=True
-        )
-
-        return
-
-
-    capitulo = capitulos[numero-1]
-
-
-    texto = (
-        f"📖 CAPÍTULO {numero}\n\n"
-        f"{capitulo['texto']}"
-    )
+    capitulo = capitulos[numero - 1]
 
 
     await callback.message.edit_text(
-        texto[:4000],
+        f"📖 CAPÍTULO {numero}\n\n"
+        f"{capitulo['texto'][:4000]}",
         reply_markup=voltar_capitulo()
     )
 
