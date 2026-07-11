@@ -1494,15 +1494,34 @@ async def receber_figurinha(message: Message):
                 + pacote["sinopse"]
             )
 
-        # Telegram aceita no máximo 1024 caracteres na legenda da foto
+        sinopse_completa = None
+
+        # Telegram aceita no máximo 1024 caracteres na legenda
         if len(caption) > 1000:
-            caption = caption[:950] + "\n\n📖 Sinopse completa enviada abaixo."
+
+            sinopse = pacote.get("sinopse", "")
+
+            if sinopse:
+
+                caption = caption.replace(
+                    "\n\n📖 SINOPSE:\n\n" + sinopse,
+                    ""
+                )
+
+                sinopse_completa = sinopse
 
         await bot.send_photo(
             chat_id=GRUPO_ACERVO,
             photo=pacote["capa"],
             caption=caption
         )
+
+        if sinopse_completa:
+
+            await bot.send_message(
+                chat_id=GRUPO_ACERVO,
+                text=f"📖 SINOPSE\n\n{sinopse_completa}"
+            )
 
         for arquivo_id in pacote["arquivos"]:
 
