@@ -159,9 +159,9 @@ configs_padrao = {
 
     "msg_nao_encontrei": "🔍 Guardião, essa missão ainda não foi encontrada no acervo.\nEla ficará guardada nas Missões Não Encontradas.",
 
-    "msg_ja_postado": "📚 Guardião, essa missão já foi concluída anteriormente.\nDá uma olhada no nosso acervo."
+    "msg_ja_postado": "📚 Guardião, essa missão já foi concluída anteriormente.\nDá uma olhada no nosso acervo.",
 
-     # NOVAS CONFIGURAÇÕES
+    # NOVAS CONFIGURAÇÕES
     "usar_sinopse": "1",
     "usar_hashtags": "1"
 }
