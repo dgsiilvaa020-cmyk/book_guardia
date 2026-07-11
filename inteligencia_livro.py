@@ -1,8 +1,80 @@
 from ebooklib import epub
 from bs4 import BeautifulSoup
 from langdetect import detect
+import re
 
 
+def extrair_sinopse_metadados(livro):
+
+    campos = [
+        ("DC", "description"),
+        ("OPF", "description"),
+        ("DC", "subject")
+    ]
+
+    for namespace, campo in campos:
+
+        dados = livro.get_metadata(namespace, campo)
+
+        if dados:
+
+            texto = dados[0][0].strip()
+
+            if len(texto) > 80:
+                return texto
+
+    return None
+    
+
+def extrair_sinopse_inicio(capitulos):
+
+    palavras = [
+        "sinopse",
+        "sobre o livro",
+        "blurb",
+        "resumo"
+    ]
+
+    for texto in capitulos[:5]:
+
+        texto_lower = texto.lower()
+
+        for palavra in palavras:
+
+            if palavra in texto_lower:
+
+                indice = texto_lower.find(palavra)
+
+                trecho = texto[indice:]
+
+                if len(trecho) > 150:
+                    return trecho[:3000]
+
+    return None
+
+
+def gerar_resumo(capitulos):
+
+    texto = "\n".join(capitulos)
+
+    frases = re.split(r"[.!?]", texto)
+
+    resumo = []
+
+    for frase in frases:
+
+        frase = frase.strip()
+
+        if len(frase) > 80:
+
+            resumo.append(frase)
+
+        if len(resumo) >= 10:
+            break
+
+    return "\n".join(resumo)
+    
+    
 def criar_memoria_temporaria():
     return {
 
@@ -413,17 +485,31 @@ def garantir_hashtag(lista):
 
 
 def analisar_livro(caminho):
-    hashtags = analisar_livro_com_memoria(caminho)
 
-    if not hashtags:
-        texto = ler_inicio_epub(caminho)
+    livro = epub.read_epub(caminho)
 
-        hashtags = gerar_hashtags(texto)
+    capitulos = ler_livro_completo(caminho)
 
-    hashtags = garantir_hashtag(hashtags)
+    sinopse = extrair_sinopse_metadados(livro)
+
+    origem = "metadados"
+
+    if not sinopse:
+
+        sinopse = extrair_sinopse_inicio(capitulos)
+
+        origem = "inicio"
+
+    if not sinopse:
+
+        sinopse = gerar_resumo(capitulos)
+
+        origem = "resumo"
 
     return {
 
-        "hashtags": hashtags
+        "sinopse": sinopse,
+
+        "origem": origem
 
     }
