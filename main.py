@@ -885,7 +885,7 @@ async def receber_capa(message: Message):
         "arquivos": [],
         "hashtags": [],
         "sinopse": "",
-        "origem_sinopse": ""
+        "origem_sinopse": "",
         "confirmado": False,
     }
 
