@@ -837,7 +837,9 @@ async def receber_capa(message: Message):
         "capa": message.photo[-1].file_id,
         "traducao": None,
         "arquivos": [],
-        "hashtags": []
+        "hashtags": [],
+        "sinopse": "",
+        "origem_sinopse": ""
     }
 
     pacotes_pendentes[admin].append(pacote)
@@ -969,13 +971,12 @@ async def receber_arquivo(message: Message):
 
         resultado = analisar_livro(caminho)
 
-        hashtags = resultado["hashtags"]
+        pacote["sinopse"] = resultado["sinopse"]
+        pacote["origem_sinopse"] = resultado["origem"]
 
-        pacote["hashtags"] = hashtags
-
-        print("HASHTAGS GERADAS:")
-        print(hashtags)
-
+        print("SINOPSE ENCONTRADA:")
+        print(resultado["origem"])
+        print(resultado["sinopse"][:500])
 
     total = len(pacote["arquivos"])
 
