@@ -135,6 +135,7 @@ def extrair_lista_capitulos_epub(caminho, limite=15):
 
     return capitulos
     
+    
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMINS = [8672397104]  # coloque seu ID aqui
 
@@ -606,19 +607,23 @@ def menu_capitulos(capitulos):
 
     kb = InlineKeyboardBuilder()
 
-    for numero, capitulo in enumerate(capitulos, start=1):
+
+    for capitulo in capitulos:
+
+        resumo = capitulo["texto"][:40]
 
         kb.button(
-            text=f"📖 Capítulo {numero}",
-            callback_data=f"abrir_capitulo_{numero}"
+            text=f"📖 Cap {capitulo['numero']}\n{resumo}...",
+            callback_data=f"abrir_capitulo_{capitulo['numero']}"
         )
+
 
     kb.button(
         text="⬅️ Voltar",
-        callback_data="voltar_capitulos_inicio"
+        callback_data="fechar_capitulos"
     )
 
-    # 4 botões por linha
+
     kb.adjust(4)
 
     return kb.as_markup()
@@ -704,6 +709,39 @@ async def start(message: Message):
         "📚 Bem-vinda, Guardiã dos Livros.\n\n"
         "Escolha uma opção:",
         reply_markup=menu_pv()
+    )
+
+@dp.callback_query(F.data == "ver_inicio_livro")
+async def ver_inicio_livro(callback: CallbackQuery):
+
+    admin = callback.from_user.id
+
+    if admin not in livros_analise:
+        await callback.answer(
+            "Nenhum EPUB encontrado.",
+            show_alert=True
+        )
+        return
+
+
+    caminho = livros_analise[admin]
+
+
+    capitulos = extrair_lista_capitulos_epub(
+        caminho,
+        limite=15
+    )
+
+
+    livros_capitulos[admin] = capitulos
+
+
+    await callback.answer()
+
+
+    await callback.message.edit_text(
+        "📖 Escolha o capítulo que deseja visualizar:",
+        reply_markup=menu_capitulos(capitulos)
     )
 
 @dp.callback_query(F.data == "ver_capitulos")
@@ -1310,10 +1348,23 @@ async def abrir_capitulo(callback: CallbackQuery):
     )
 
 
+    partes = [
+        texto[i:i+4000]
+        for i in range(0,len(texto),4000)
+    ]
+
+
+    await callback.answer()
+
+
     await callback.message.edit_text(
-        texto,
+        partes[0],
         reply_markup=voltar_capitulo()
     )
+
+
+    for parte in partes[1:]:
+        await callback.message.answer(parte)
     
 
 @dp.message(F.chat.type == "private", F.sticker)
