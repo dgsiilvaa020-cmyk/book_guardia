@@ -210,6 +210,115 @@ livros_capitulos = {}
 
 modo_edicao = {}
 
+hashtags_selecionadas = {}
+
+hashtags_disponiveis = {
+
+    "📚 Fantasia": [
+        "#fantasia",
+        "#magia",
+        "#dragao",
+        "#vampiro",
+        "#lobisomem",
+        "#bruxa",
+        "#feericos",
+        "#realeza",
+        "#profecia",
+        "#poderes"
+    ],
+
+    "🖤 Dark Romance": [
+        "#darkromance",
+        "#obsessivo",
+        "#possessivo",
+        "#vinganca",
+        "#sequestro",
+        "#morallygrey",
+        "#enemiestolovers",
+        "#slowburn"
+    ],
+
+    "🔫 Máfia": [
+        "#mafia",
+        "#bratva",
+        "#camorra",
+        "#cartel",
+        "#mafioso",
+        "#crime",
+        "#dondamafia",
+        "#submundo"
+    ],
+
+    "💕 Romance": [
+        "#romance",
+        "#casamentoforcado",
+        "#grumpyxsunshine",
+        "#friendsTolovers",
+        "#enemiestolovers",
+        "#fakeDating",
+        "#secondChance"
+    ],
+
+    "🏰 Realeza": [
+        "#realeza",
+        "#principe",
+        "#princesa",
+        "#rei",
+        "#rainha",
+        "#castelo"
+    ],
+
+    "😈 Sobrenatural": [
+        "#anjo",
+        "#demonio",
+        "#necromante",
+        "#imortal",
+        "#sobrenatural"
+    ],
+
+    "🎓 Academia": [
+        "#academia",
+        "#universidade",
+        "#faculdade",
+        "#college",
+        "#campus",
+        "#academy"
+    ],
+
+    "❤️‍🔥 Harém": [
+        "#haremreverso",
+        "#whychoose",
+        "#reverseharem",
+        "#multipleloveinterest"
+    ]
+}
+
+hashtags_selecionadas = {}
+
+CATEGORIAS_HASHTAGS = [
+
+    "🧙 Fantasia",
+    "🩸 Dark Romance",
+    "🔫 Máfia",
+    "❤️ Romance",
+
+    "👑 Realeza",
+    "🐺 Sobrenatural",
+    "🎓 Academia",
+    "💼 Bilionário",
+
+    "💍 Casamento",
+    "👶 Gravidez",
+    "🔥 Hot",
+    "🕵️ Suspense",
+
+    "😈 Demônios",
+    "👼 Anjos",
+    "🧛 Vampiros",
+    "🐉 Dragões"
+
+]
+
 def autorizado(user_id: int):
     return user_id in ADMINS
 
@@ -656,6 +765,32 @@ def menu_confirmar_livro():
     kb.adjust(1)
 
     return kb.as_markup()
+
+
+def menu_categorias_hashtags():
+
+    kb = InlineKeyboardBuilder()
+
+    for categoria in hashtags_disponiveis.keys():
+
+        kb.button(
+            text=categoria,
+            callback_data=f"categoria_{categoria}"
+        )
+
+    kb.button(
+        text="✅ Concluir",
+        callback_data="hashtags_finalizar"
+    )
+
+    kb.button(
+        text="⬅️ Voltar",
+        callback_data="voltar_confirmacao"
+    )
+
+    kb.adjust(4)
+
+    return kb.as_markup()
     
 
 def voltar_capitulo():
@@ -670,7 +805,48 @@ def voltar_capitulo():
     kb.adjust(1)
 
     return kb.as_markup()
+    
 
+def menu_categorias_hashtags():
+
+    kb = InlineKeyboardBuilder()
+
+    for categoria in CATEGORIAS_HASHTAGS:
+
+        kb.button(
+            text=categoria,
+            callback_data=f"categoria_{categoria}"
+        )
+
+    kb.button(
+        text="⬅️ Voltar",
+        callback_data="voltar_confirmacao"
+    )
+
+    kb.adjust(4)
+
+    return kb.as_markup()
+
+def menu_hashtags_categoria(categoria):
+
+    kb = InlineKeyboardBuilder()
+
+    for hashtag in hashtags_disponiveis[categoria]:
+
+        kb.button(
+            text=hashtag,
+            callback_data=f"tag_{hashtag}"
+        )
+
+    kb.button(
+        text="⬅️ Voltar",
+        callback_data="voltar_categorias"
+    )
+
+    kb.adjust(4)
+
+    return kb.as_markup()
+    
 
 def menu_pedidos(pedidos):
     kb = InlineKeyboardBuilder()
@@ -710,6 +886,94 @@ async def start(message: Message):
         "Escolha uma opção:",
         reply_markup=menu_pv()
     )
+
+@dp.callback_query(F.data.startswith("tag_"))
+async def escolher_hashtag(callback: CallbackQuery):
+
+    admin = callback.from_user.id
+
+    hashtag = callback.data.replace("tag_", "")
+
+    hashtags_selecionadas.setdefault(admin, [])
+
+    if hashtag in hashtags_selecionadas[admin]:
+
+        await callback.answer(
+            "Essa hashtag já foi escolhida.",
+            show_alert=True
+        )
+        return
+
+    if len(hashtags_selecionadas[admin]) >= 5:
+
+        await callback.answer(
+            "Você pode escolher no máximo 5 hashtags.",
+            show_alert=True
+        )
+        return
+
+    hashtags_selecionadas[admin].append(hashtag)
+
+    await callback.answer(f"{hashtag} adicionada ✅")
+    
+
+@dp.callback_query(F.data == "hashtags_finalizar")
+async def finalizar_hashtags(callback: CallbackQuery):
+
+    admin = callback.from_user.id
+
+    if admin not in pacotes_pendentes:
+        await callback.answer()
+        return
+
+    pacote = pacotes_pendentes[admin][-1]
+
+    pacote["hashtags"] = hashtags_selecionadas.get(admin, [])
+
+    hashtags_selecionadas.pop(admin, None)
+
+    await callback.answer()
+
+    await callback.message.edit_text(
+        "✅ Hashtags salvas!\n\nAgora confirme o livro.",
+        reply_markup=menu_confirmar_livro()
+    )
+
+@dp.callback_query(F.data == "escolher_hashtags")
+async def abrir_menu_hashtags(callback: CallbackQuery):
+
+    hashtags_selecionadas[callback.from_user.id] = []
+
+    await callback.answer()
+
+    await callback.message.edit_text(
+        "🏷️ Escolha uma categoria:",
+        reply_markup=menu_categorias_hashtags()
+    )
+    
+
+@dp.callback_query(F.data.startswith("categoria_"))
+async def abrir_categoria(callback: CallbackQuery):
+
+    categoria = callback.data.replace("categoria_", "")
+
+    await callback.answer()
+
+    await callback.message.edit_text(
+        f"🏷️ {categoria}\n\nEscolha até 5 hashtags:",
+        reply_markup=menu_hashtags_categoria(categoria)
+    )
+
+@dp.callback_query(F.data == "voltar_categorias")
+async def voltar_categorias(callback: CallbackQuery):
+
+    await callback.answer()
+
+    await callback.message.edit_text(
+        "🏷️ Escolha uma categoria:",
+        reply_markup=menu_categorias_hashtags()
+    )
+    
 
 @dp.callback_query(F.data == "ver_inicio_livro")
 async def ver_inicio_livro(callback: CallbackQuery):
@@ -1057,6 +1321,17 @@ async def editar_sinopse(callback: CallbackQuery):
     await callback.message.answer(
         "✏️ Envie agora a sinopse personalizada.\n\n"
         "Ela será colocada junto com a capa do livro."
+    )
+    
+    
+@dp.callback_query(F.data == "escolher_hashtags")
+async def escolher_hashtags(callback: CallbackQuery):
+
+    await callback.answer()
+
+    await callback.message.edit_text(
+        "🏷️ Escolha uma categoria:",
+        reply_markup=menu_categorias_hashtags()
     )
     
 
