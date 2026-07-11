@@ -78,8 +78,88 @@ def ler_capitulos_epub(caminho, limite=5):
 
     return "\n\n━━━━━━━━━━━━━━\n\n".join(capitulos)
     
-    
 
+def extrair_lista_capitulos_epub(caminho, limite=15):
+
+    livro = epub.read_epub(caminho)
+
+    capitulos = []
+
+    numero = 0
+
+    for item_id, _ in livro.spine:
+
+        item = livro.get_item_with_id(item_id)
+
+        if not item:
+            continue
+
+        if item.get_type() != 9:
+            continue
+
+        soup = BeautifulSoup(
+            item.get_content(),
+            "html.parser"
+        )
+
+        texto = ""
+
+        for tag in soup.find_all(
+            ["h1", "h2", "h3", "p"]
+        ):
+
+            conteudo = tag.get_text(
+                " ",
+                strip=True
+            )
+
+            if conteudo:
+                texto += conteudo + "\n\n"
+
+
+        if texto.strip():
+
+            numero += 1
+
+            capitulos.append(
+                {
+                    "numero": numero,
+                    "texto": texto.strip()
+                }
+            )
+
+
+        if numero >= limite:
+            break
+
+
+    return capitulos
+
+def menu_capitulos(capitulos):
+
+    kb = InlineKeyboardBuilder()
+
+
+    for capitulo in capitulos:
+
+        resumo = capitulo["texto"][:40]
+
+        kb.button(
+            text=f"📖 Cap {capitulo['numero']}\n{resumo}...",
+            callback_data=f"abrir_capitulo_{capitulo['numero']}"
+        )
+
+
+    kb.button(
+        text="⬅️ Voltar",
+        callback_data="fechar_capitulos"
+    )
+
+
+    kb.adjust(4)
+
+    return kb.as_markup()
+    
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMINS = [8672397104]  # coloque seu ID aqui
 
@@ -149,6 +229,8 @@ pedido_selecionado = {}
 pacotes_pendentes = {}
 
 livros_analise = {}
+
+livros_capitulos = {}
 
 modo_edicao = {}
 
@@ -544,6 +626,29 @@ def menu_configuracoes():
 
     return kb.as_markup()
 
+
+def menu_capitulos(capitulos):
+
+    kb = InlineKeyboardBuilder()
+
+    for numero, capitulo in enumerate(capitulos, start=1):
+
+        kb.button(
+            text=f"📖 Capítulo {numero}",
+            callback_data=f"abrir_capitulo_{numero}"
+        )
+
+    kb.button(
+        text="⬅️ Voltar",
+        callback_data="voltar_capitulos_inicio"
+    )
+
+    # 4 botões por linha
+    kb.adjust(4)
+
+    return kb.as_markup()
+    
+
 def menu_confirmar_livro():
 
     kb = InlineKeyboardBuilder()
@@ -569,6 +674,18 @@ def menu_confirmar_livro():
     )
 
     kb.adjust(1)
+
+    return kb.as_markup()
+    
+
+def voltar_capitulo():
+
+    kb = InlineKeyboardBuilder()
+
+    kb.button(
+        text="⬅️ Voltar capítulos",
+        callback_data="voltar_lista_capitulos"
+    )
 
     return kb.as_markup()
 
@@ -655,6 +772,18 @@ async def toggle_sinopse(callback: CallbackQuery):
     await callback.message.edit_reply_markup(
         reply_markup=menu_configuracoes()
     )
+    
+
+@dp.callback_query(F.data == "voltar_lista_capitulos")
+async def voltar_lista_capitulos(callback: CallbackQuery):
+
+    await callback.answer()
+
+    await callback.message.edit_text(
+        "📖 Escolha um capítulo:",
+        reply_markup=menu_capitulos()
+    )
+
 
 @dp.callback_query(F.data == "toggle_hashtags")
 async def toggle_hashtags(callback: CallbackQuery):
@@ -1130,42 +1259,47 @@ async def receber_arquivo(message: Message):
     )
     
 
-@dp.callback_query(F.data == "ver_inicio_livro")
-async def ver_inicio_livro(callback: CallbackQuery):
+@dp.callback_query(F.data.startswith("abrir_capitulo_"))
+async def abrir_capitulo(callback: CallbackQuery):
 
     admin = callback.from_user.id
 
-    if admin not in livros_analise:
+    numero = int(
+        callback.data.replace(
+            "abrir_capitulo_",
+            ""
+        )
+    )
+
+
+    capitulos = livros_capitulos.get(admin)
+
+
+    if not capitulos:
         await callback.answer(
-            "Nenhum EPUB encontrado.",
+            "Prévia expirada.",
             show_alert=True
         )
         return
 
-    caminho = livros_analise[admin]
 
-    texto = ler_capitulos_epub(
-        caminho,
-        limite=15
+    capitulo = capitulos[numero-1]
+
+
+    texto = (
+        f"📖 CAPÍTULO {numero}\n\n"
+        f"{capitulo['texto']}"
     )
 
-    if not texto:
-        texto = "Não consegui extrair o começo do livro."
 
-    await callback.answer()
+    await callback.message.edit_text(
+        "📖 Escolha um capítulo para visualizar:",
+        reply_markup=menu_capitulos(capitulos)
+    )
 
-    # Divide em mensagens menores para o Telegram
-    partes = [
-        texto[i:i+4000]
-        for i in range(0, len(texto), 4000)
-    ]
 
-    for parte in partes:
-
-        await callback.message.answer(
-            "📖 <b>Primeiras páginas do livro:</b>\n\n" + parte,
-            parse_mode="HTML"
-        )
+    for parte in partes[1:]:
+        await callback.message.answer(parte)
     
 
 @dp.message(F.chat.type == "private", F.sticker)
