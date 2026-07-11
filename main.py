@@ -23,10 +23,13 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 
 
-def ler_primeiras_paginas(caminho, limite=5):
+def ler_capitulos_epub(caminho, limite=5):
+
     livro = epub.read_epub(caminho)
 
-    paginas = []
+    capitulos = []
+
+    numero = 0
 
     for item in livro.get_items():
 
@@ -37,17 +40,36 @@ def ler_primeiras_paginas(caminho, limite=5):
                 "html.parser"
             )
 
-            texto = soup.get_text(" ", strip=True)
+            texto = ""
 
-            if texto:
+            for tag in soup.find_all(
+                ["h1", "h2", "h3", "p"]
+            ):
 
-                paginas.append(texto)
+                conteudo = tag.get_text(
+                    " ",
+                    strip=True
+                )
 
-            if len(paginas) >= limite:
+                if conteudo:
+                    texto += conteudo + "\n\n"
+
+
+            if texto.strip():
+
+                numero += 1
+
+                capitulos.append(
+                    f"📖 CAPÍTULO {numero}\n\n{texto}"
+                )
+
+
+            if numero >= limite:
                 break
 
-    return "\n".join(paginas)
 
+    return "\n\n━━━━━━━━━━━━━━\n\n".join(capitulos)
+    
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMINS = [8672397104]  # coloque seu ID aqui
@@ -657,6 +679,26 @@ async def receber_texto_personalizado(message: Message):
         await message.answer("⚠️ Envie uma figurinha, não uma mensagem de texto.")
         return
 
+    if chave == "sinopse_manual":
+
+    pacote = pacotes_pendentes[message.from_user.id][-1]
+
+    pacote["sinopse"] = message.text
+    pacote["origem_sinopse"] = "manual"
+
+    modo_edicao.pop(
+        message.from_user.id,
+        None
+    )
+
+    await message.answer(
+        "✅ Sinopse personalizada salva!",
+        reply_markup=menu_confirmar_livro()
+    )
+
+    return
+    
+
     salvar_config(chave, message.text)
     modo_edicao.pop(message.from_user.id, None)
 
@@ -806,6 +848,29 @@ async def missoes_nao_encontradas(callback: CallbackQuery):
         reply_markup=menu_pedidos(pedidos)
     )
 
+
+@dp.callback_query(F.data == "editar_sinopse")
+async def editar_sinopse(callback: CallbackQuery):
+
+    admin = callback.from_user.id
+
+    if admin not in pacotes_pendentes:
+        await callback.answer(
+            "Nenhum livro carregado.",
+            show_alert=True
+        )
+        return
+
+
+    modo_edicao[admin] = "sinopse_manual"
+
+    await callback.answer()
+
+    await callback.message.answer(
+        "✏️ Envie agora a sinopse personalizada.\n\n"
+        "Ela será colocada junto com a capa do livro."
+    )
+    
 
 @dp.callback_query(F.data.startswith("selecionar_"))
 async def selecionar_pedido(callback: CallbackQuery):
@@ -1069,7 +1134,7 @@ async def ver_inicio_livro(callback: CallbackQuery):
     caminho = livros_analise[admin]
 
 
-    texto = ler_primeiras_paginas(
+    texto = ler_capitulos_epub(
         caminho,
         limite=15
     )
@@ -1205,6 +1270,16 @@ async def receber_figurinha(message: Message):
             )
 
         print("ENVIANDO CAPA:", pacote)
+
+        if (
+            pacote.get("sinopse")
+            and pegar_config("usar_sinopse") == "1"
+        ):
+
+            caption += (
+                "\n\n📖 SINOPSE:\n\n"
+                + pacote["sinopse"]
+            )
             
         await bot.send_photo(
             chat_id=GRUPO_ACERVO,
