@@ -767,34 +767,7 @@ def menu_confirmar_livro():
     kb.adjust(1)
 
     return kb.as_markup()
-
-
-def menu_categorias_hashtags():
-
-    kb = InlineKeyboardBuilder()
-
-    for categoria in hashtags_disponiveis.keys():
-
-        kb.button(
-            text=categoria,
-            callback_data=f"categoria_{categoria}"
-        )
-
-    kb.button(
-        text="✅ Concluir",
-        callback_data="hashtags_finalizar"
-    )
-
-    kb.button(
-        text="⬅️ Voltar",
-        callback_data="voltar_confirmacao"
-    )
-
-    kb.adjust(4)
-
-    return kb.as_markup()
     
-
 def menu_pagina_capitulo(numero, total):
 
     kb = InlineKeyboardBuilder()
@@ -1579,15 +1552,13 @@ async def receber_arquivo(message: Message):
     texto = (
         "📚 <b>Livro analisado!</b>\n\n"
 
-        f"<b>📖 Título:</b>\n{pacote.get('nome_livro','-')}\n\n"
+        f"📖 <b>{pacote.get('nome_livro','-')}</b>\n"
 
-        f"<b>✍️ Autor:</b>\n{pacote.get('autor','-')}\n\n"
+        f"✍️ {pacote.get('autor','-')}\n"
 
-        f"<b>📚 Série:</b>\n{pacote.get('serie') or '—'}\n\n"
+        f"{'📚 ' + pacote.get('serie') if pacote.get('serie') else ''}\n\n"
 
-       f"<b>📌 Origem da sinopse:</b>\n{origem}\n\n"
-
-        "━━━━━━━━━━━━━━\n"
+        "━━━━━━━━━━━━━━\n\n"
 
         "<b>📖 SINOPSE</b>\n\n"
 
@@ -1659,6 +1630,8 @@ async def abrir_capitulo(callback: CallbackQuery):
 
 @dp.callback_query(F.data.startswith("pagina_cap_"))
 async def pagina_capitulo(callback: CallbackQuery):
+
+    @dp.callback_query(F.data.startswith("pagina_cap_"))
 
     admin = callback.from_user.id
 
@@ -1799,30 +1772,24 @@ async def receber_figurinha(message: Message):
             )        
         )
 
-         caption = (
-            f"📚 <b>{pacote.get('nome_livro','Livro não informado')}</b>\n"
-            f"✍️ {pacote.get('autor','Autor não informado')}\n"
-        )
-
-        if pacote.get("serie"):
-            caption += (
-                f"📖 {pacote['serie']}\n"
-            )
-
-        if pacote.get("traducao"):
-            caption += (
-                f"🌐 {pacote['traducao']}\n"
-            )
+        caption = legenda
+            
+        if pacote["traducao"]:
+            caption += f"\n\n🌐 Tradução: {pacote['traducao']}"
 
         if pacote.get("hashtags"):
             caption += (
-                "\n🏷️ "
+                "\n\n🏷️ "
                 + " ".join(pacote["hashtags"])
             )
 
         if (
             pacote.get("sinopse")
             and pegar_config("usar_sinopse") == "1"
+        ):
+            caption += (
+                "\n\n📖 SINOPSE:\n\n"
+                + pacote["sinopse"]
         ):
             caption += (
                 "\n\n━━━━━━━━━━━━\n\n"
