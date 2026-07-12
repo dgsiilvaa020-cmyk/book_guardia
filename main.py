@@ -1777,10 +1777,10 @@ async def receber_figurinha(message: Message):
 
         if sinopse_completa:
 
-        await bot.send_message(
-            chat_id=GRUPO_ACERVO,
-            text=f"📖 SINOPSE\n\n{sinopse_completa}"
-        )
+           await bot.send_message(
+               chat_id=GRUPO_ACERVO,
+               text=f"📖 SINOPSE\n\n{sinopse_completa}"
+           )
 
         for arquivo_id in pacote["arquivos"]:
 
