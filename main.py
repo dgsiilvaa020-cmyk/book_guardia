@@ -1631,7 +1631,7 @@ async def abrir_capitulo(callback: CallbackQuery):
 @dp.callback_query(F.data.startswith("pagina_cap_"))
 async def pagina_capitulo(callback: CallbackQuery):
 
-    @dp.callback_query(F.data.startswith("pagina_cap_"))
+    await callback.answer()
 
     admin = callback.from_user.id
 
