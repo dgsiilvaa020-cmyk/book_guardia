@@ -208,6 +208,8 @@ livros_analise = {}
 
 livros_capitulos = {}
 
+paginas_capitulos = {}
+
 modo_edicao = {}
 
 hashtags_selecionadas = {}
@@ -793,16 +795,27 @@ def menu_categorias_hashtags():
     return kb.as_markup()
     
 
-def voltar_capitulo():
+def menu_pagina_capitulo(numero, total):
 
     kb = InlineKeyboardBuilder()
 
+    if numero > 1:
+        kb.button(
+            text="⬅️ Voltar",
+            callback_data=f"pagina_cap_{numero-1}"
+        )
+
     kb.button(
-        text="⬅️ Voltar capítulos",
+        text="➡️ Próxima",
+        callback_data=f"pagina_cap_{numero+1}"
+    )
+
+    kb.button(
+        text="🏠 Capítulos",
         callback_data="voltar_lista_capitulos"
     )
 
-    kb.adjust(1)
+    kb.adjust(2)
 
     return kb.as_markup()
     
@@ -1012,6 +1025,8 @@ async def ver_inicio_livro(callback: CallbackQuery):
 async def ver_capitulos(callback: CallbackQuery):
 
     admin = callback.from_user.id
+
+    paginas_capitulos.pop(admin, None)
 
     capitulos = livros_capitulos.get(admin)
 
@@ -1589,7 +1604,6 @@ async def receber_arquivo(message: Message):
         reply_markup=menu_confirmar_livro()
     )
     
-
 @dp.callback_query(F.data.startswith("abrir_capitulo_"))
 async def abrir_capitulo(callback: CallbackQuery):
 
@@ -1602,44 +1616,87 @@ async def abrir_capitulo(callback: CallbackQuery):
         )
     )
 
-
     capitulos = livros_capitulos.get(admin)
-
 
     if not capitulos:
         await callback.answer(
-            "Prévia expirada.",
+            "Capítulo expirado.",
             show_alert=True
         )
         return
 
 
-    capitulo = capitulos[numero-1]
-
-
     texto = (
         f"📖 CAPÍTULO {numero}\n\n"
-        f"{capitulo['texto']}"
+        f"{capitulos[numero-1]['texto']}"
     )
 
 
-    partes = [
-        texto[i:i+4000]
-        for i in range(0,len(texto),4000)
+    paginas = [
+        texto[i:i+3500]
+        for i in range(
+            0,
+            len(texto),
+            3500
+        )
     ]
+
+
+    paginas_capitulos[admin] = paginas
 
 
     await callback.answer()
 
 
     await callback.message.edit_text(
-        partes[0],
-        reply_markup=voltar_capitulo()
+        f"{paginas[0]}\n\n"
+        f"Página 1/{len(paginas)}",
+        reply_markup=menu_pagina_capitulo(
+            1,
+            len(paginas)
+        )
+    )
+
+@dp.callback_query(F.data.startswith("pagina_cap_"))
+async def pagina_capitulo(callback: CallbackQuery):
+
+    admin = callback.from_user.id
+
+    pagina = int(
+        callback.data.replace(
+            "pagina_cap_",
+            ""
+        )
     )
 
 
-    for parte in partes[1:]:
-        await callback.message.answer(parte)
+    paginas = paginas_capitulos.get(admin)
+
+
+    if not paginas:
+        await callback.answer(
+            "Página expirada.",
+            show_alert=True
+        )
+        return
+
+
+    if pagina < 1 or pagina > len(paginas):
+        await callback.answer()
+        return
+
+
+    await callback.answer()
+
+
+    await callback.message.edit_text(
+        f"{paginas[pagina-1]}\n\n"
+        f"Página {pagina}/{len(paginas)}",
+        reply_markup=menu_pagina_capitulo(
+            pagina,
+            len(paginas)
+        )
+    )
     
 
 @dp.message(F.chat.type == "private", F.sticker)
