@@ -1800,39 +1800,38 @@ async def receber_figurinha(message: Message):
         )
 
         caption = (
-           f"📚 <b>{pacote.get('nome_livro', 'Livro não informado')}</b>\n\n"
-           f"✍️ <b>Autora:</b>\n"
-           f"{pacote.get('autor', 'Autor não informado')}\n"
-       )
+            f"📚 <b>{pacote.get('nome_livro', 'Livro não informado')}</b>\n\n"
+            f"✍️ <b>Autora:</b>\n"
+            f"{pacote.get('autor', 'Autor não informado')}\n"
+        )
 
-       if pacote.get("serie"):
-           caption += (
-               f"\n📖 <b>Série:</b>\n"
-               f"{pacote['serie']}"
-           )
+        if pacote.get("serie"):
+            caption += (
+                f"\n📖 <b>Série:</b>\n"
+                f"{pacote['serie']}\n"
+            )
 
-       if pacote.get("traducao"):
-           caption += (
-               f"\n\n🌐 <b>Tradução:</b>\n"
-               f"{pacote['traducao']}"
-           )
+        if pacote.get("traducao"):
+            caption += (
+                f"\n🌐 <b>Tradução:</b>\n"
+                f"{pacote['traducao']}\n"
+            )
 
-       if pacote.get("hashtags"):
-           caption += (
-               "\n\n🏷️ <b>Categorias:</b>\n"
-               + " ".join(pacote["hashtags"])
-           )
+        if pacote.get("hashtags"):
+            caption += (
+                "\n🏷️ <b>Categorias:</b>\n"
+                + " ".join(pacote["hashtags"])
+            )
 
-       if (
-           pacote.get("sinopse")
-           and pegar_config("usar_sinopse") == "1"
-       ):
-
-           caption += (
-               "\n\n━━━━━━━━━━━━━━\n\n"
-               "📖 <b>SINOPSE</b>\n\n"
-               + pacote["sinopse"]
-           )
+        if (
+            pacote.get("sinopse")
+            and pegar_config("usar_sinopse") == "1"
+        ):
+            caption += (
+                "\n\n━━━━━━━━━━━━━━\n\n"
+                "📖 <b>SINOPSE</b>\n\n"
+                + pacote["sinopse"]
+            )
 
         await bot.send_photo(
             chat_id=GRUPO_ACERVO,
