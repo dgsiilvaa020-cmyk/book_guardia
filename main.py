@@ -1790,11 +1790,6 @@ async def receber_figurinha(message: Message):
             caption += (
                 "\n\n📖 SINOPSE:\n\n"
                 + pacote["sinopse"]
-        ):
-            caption += (
-                "\n\n━━━━━━━━━━━━\n\n"
-                "📖 <b>SINOPSE</b>\n"
-                + pacote["sinopse"]
             )
 
         await bot.send_photo(
