@@ -1799,37 +1799,46 @@ async def receber_figurinha(message: Message):
             )        
         )
 
-        caption = legenda
-        # Apenas a primeira capa recebe a legenda completa
-        caption = legenda
-            
-        if pacote["traducao"]:
-            caption += f"\n\n🌐 Tradução: {pacote['traducao']}"
-            
+       caption = (
+           f"📚 <b>{pacote.get('nome_livro', 'Livro não informado')}</b>\n\n"
+           f"✍️ <b>Autora:</b>\n"
+           f"{pacote.get('autor', 'Autor não informado')}\n"
+       )
 
-        if pacote.get("hashtags"):
+       if pacote.get("serie"):
+           caption += (
+               f"\n📖 <b>Série:</b>\n"
+               f"{pacote['serie']}"
+           )
 
-            caption += (
-                "\n\n🏷️ "
-                + " ".join(pacote["hashtags"])
-            )
+       if pacote.get("traducao"):
+           caption += (
+               f"\n\n🌐 <b>Tradução:</b>\n"
+               f"{pacote['traducao']}"
+           )
 
-        print("ENVIANDO CAPA:", pacote)
+       if pacote.get("hashtags"):
+           caption += (
+               "\n\n🏷️ <b>Categorias:</b>\n"
+               + " ".join(pacote["hashtags"])
+           )
 
-        if (
-            pacote.get("sinopse")
-            and pegar_config("usar_sinopse") == "1"
-        ):
+       if (
+           pacote.get("sinopse")
+           and pegar_config("usar_sinopse") == "1"
+       ):
 
-            caption += (
-                "\n\n📖 SINOPSE:\n\n"
-                + pacote["sinopse"]
-            )
+           caption += (
+               "\n\n━━━━━━━━━━━━━━\n\n"
+               "📖 <b>SINOPSE</b>\n\n"
+               + pacote["sinopse"]
+           )
 
         await bot.send_photo(
             chat_id=GRUPO_ACERVO,
             photo=pacote["capa"],
-            caption=caption
+            caption=caption,
+            parse_mode="HTML"
         )
 
         for arquivo_id in pacote["arquivos"]:
