@@ -1574,6 +1574,17 @@ async def receber_arquivo(message: Message):
         parse_mode="HTML",
         reply_markup=menu_confirmar_livro()
     )
+
+@dp.callback_query(F.data == "fechar_capitulos")
+async def fechar_capitulos(callback: CallbackQuery):
+
+    await callback.answer()
+
+    await callback.message.edit_text(
+        "📚 Livro analisado!\n\n"
+        "Escolha uma opção:",
+        reply_markup=menu_confirmar_livro()
+    )
     
 @dp.callback_query(F.data.startswith("abrir_capitulo_"))
 async def abrir_capitulo(callback: CallbackQuery):
