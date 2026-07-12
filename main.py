@@ -1799,27 +1799,24 @@ async def receber_figurinha(message: Message):
             )        
         )
 
-        caption = (
-            f"📚 <b>{pacote.get('nome_livro', 'Livro não informado')}</b>\n\n"
-            f"✍️ <b>Autora:</b>\n"
-            f"{pacote.get('autor', 'Autor não informado')}\n"
+         caption = (
+            f"📚 <b>{pacote.get('nome_livro','Livro não informado')}</b>\n"
+            f"✍️ {pacote.get('autor','Autor não informado')}\n"
         )
 
         if pacote.get("serie"):
             caption += (
-                f"\n📖 <b>Série:</b>\n"
-                f"{pacote['serie']}\n"
+                f"📖 {pacote['serie']}\n"
             )
 
         if pacote.get("traducao"):
             caption += (
-                f"\n🌐 <b>Tradução:</b>\n"
-                f"{pacote['traducao']}\n"
+                f"🌐 {pacote['traducao']}\n"
             )
 
         if pacote.get("hashtags"):
             caption += (
-                "\n🏷️ <b>Categorias:</b>\n"
+                "\n🏷️ "
                 + " ".join(pacote["hashtags"])
             )
 
@@ -1828,8 +1825,8 @@ async def receber_figurinha(message: Message):
             and pegar_config("usar_sinopse") == "1"
         ):
             caption += (
-                "\n\n━━━━━━━━━━━━━━\n\n"
-                "📖 <b>SINOPSE</b>\n\n"
+                "\n\n━━━━━━━━━━━━\n\n"
+                "📖 <b>SINOPSE</b>\n"
                 + pacote["sinopse"]
             )
 
