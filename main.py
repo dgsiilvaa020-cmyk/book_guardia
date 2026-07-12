@@ -1799,7 +1799,7 @@ async def receber_figurinha(message: Message):
             )        
         )
 
-       caption = (
+        caption = (
            f"📚 <b>{pacote.get('nome_livro', 'Livro não informado')}</b>\n\n"
            f"✍️ <b>Autora:</b>\n"
            f"{pacote.get('autor', 'Autor não informado')}\n"
