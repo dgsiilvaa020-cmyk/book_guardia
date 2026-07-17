@@ -137,7 +137,7 @@ def extrair_lista_capitulos_epub(caminho, limite=15):
     
     
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMINS = [8672397104]  # coloque seu ID aqui
+ADMINS = [8672397104, 1130170420]  # coloque seu ID aqui
 
 # Grupo onde os Aliados fazem os pedidos
 GRUPO_PEDIDOS = -1003609010797
