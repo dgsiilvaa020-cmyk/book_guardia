@@ -825,6 +825,11 @@ def menu_hashtags_categoria(categoria):
         )
 
     kb.button(
+        text="✅ Finalizar",
+        callback_data="hashtags_finalizar"
+    )
+
+    kb.button(
         text="⬅️ Voltar",
         callback_data="voltar_categorias"
     )
@@ -873,6 +878,7 @@ async def start(message: Message):
         reply_markup=menu_pv()
     )
 
+
 @dp.callback_query(F.data.startswith("tag_"))
 async def escolher_hashtag(callback: CallbackQuery):
 
@@ -884,24 +890,24 @@ async def escolher_hashtag(callback: CallbackQuery):
 
     if hashtag in hashtags_selecionadas[admin]:
 
-        await callback.answer(
-            "Essa hashtag já foi escolhida.",
-            show_alert=True
-        )
-        return
+        hashtags_selecionadas[admin].remove(hashtag)
 
-    if len(hashtags_selecionadas[admin]) >= 5:
+        await callback.answer(f"{hashtag} removida ❌")
 
-        await callback.answer(
-            "Você pode escolher no máximo 5 hashtags.",
-            show_alert=True
-        )
-        return
+    else:
 
-    hashtags_selecionadas[admin].append(hashtag)
+        if len(hashtags_selecionadas[admin]) >= 5:
 
-    await callback.answer(f"{hashtag} adicionada ✅")
-    
+            await callback.answer(
+                "Máximo de 5 hashtags.",
+                show_alert=True
+            )
+            return
+
+        hashtags_selecionadas[admin].append(hashtag)
+
+        await callback.answer(f"{hashtag} adicionada ✅")
+        
 
 @dp.callback_query(F.data == "hashtags_finalizar")
 async def finalizar_hashtags(callback: CallbackQuery):
