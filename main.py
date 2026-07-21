@@ -797,7 +797,7 @@ def menu_categorias_hashtags():
 
     kb = InlineKeyboardBuilder()
 
-    for categoria in CATEGORIAS_HASHTAGS:
+    for categoria in hashtags_disponiveis.keys():
 
         kb.button(
             text=categoria,
